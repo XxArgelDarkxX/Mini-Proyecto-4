@@ -1,9 +1,6 @@
 # Compiled class file
 *.class
 
-#Java Compilitation Cache
-.out
-
 # Log file
 *.log
 
@@ -32,3 +29,6 @@ replay_pid*
 
 # VsCode
 .vscode
+
+# Cache
+**/out/
