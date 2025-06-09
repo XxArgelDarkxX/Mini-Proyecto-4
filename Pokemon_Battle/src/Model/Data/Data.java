@@ -3,6 +3,8 @@ package Model.Data;
 import Model.Movement;
 import Model.Pokemon;
 import Model.Type;
+import Model.Exceptions.pokemonBattle.unknownPokemonTypeException;
+
 import java.util.ArrayList;
 
 public class Data {
@@ -296,7 +298,7 @@ public class Data {
         return pokemons;
     }
 
-    public static ArrayList<Movement> getMoves(Type type) {
+    public static ArrayList<Movement> getMoves(Type type) throws unknownPokemonTypeException {
         initializeMoves();
         return switch (type) {
             case FUEGO -> fireMoves;
@@ -317,7 +319,7 @@ public class Data {
             case NORMAL -> normalMoves;
             case ACERO -> steelMoves;
             case VENENO -> poisonMoves;
-            default -> throw new IllegalArgumentException("Tipo de Pokemon Desconocido: " + type);
+            default -> throw new unknownPokemonTypeException("Tipo de Pokemon Desconocido: " + type); //Exception 
         };
     }
 }

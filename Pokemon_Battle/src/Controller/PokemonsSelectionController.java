@@ -26,6 +26,7 @@ public class PokemonsSelectionController {
     public void processPokemonSelection() {
         view.stopMusic();
         view.nextView();
+
         
     }
 

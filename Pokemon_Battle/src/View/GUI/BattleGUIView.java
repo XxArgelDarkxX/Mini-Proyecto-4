@@ -29,7 +29,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingWorker;
@@ -38,8 +40,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
 import Model.Trainer;
+import Model.BattleHistory;
 import Model.Pokemon;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -53,6 +57,9 @@ public class BattleGUIView extends JFrame {
     public byte moveTrainer2 = -1;
     public byte x = 0;
     public byte y = 0;
+
+    private BattleHistory battleHistory;
+    private JTextArea battleLogArea;
     class PokemonHealthBar extends JPanel {
         private float currentHP;
         private final float maxHP;
@@ -142,13 +149,28 @@ public class BattleGUIView extends JFrame {
         loadPokemonImage();
         loadPokemonImage2();
     }
+
     public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) {
         this.pokemonsBattle = pokemonsBattle;
         this.trainers = trainers;
+        this.battleHistory = new BattleHistory(trainers[0].getName(), trainers[1].getName());
+        battleHistory.logBattleStart(); // Registrar inicio de batalla
         initComponents();
         initializePokemonSelection();
         loadPokemonImage();
         loadPokemonImage2();
+        initializeBattleLogPanel();
+    }
+    
+    private void initializeBattleLogPanel() {
+        battleLogArea = new JTextArea(8, 60);
+        battleLogArea.setEditable(false);
+        battleLogArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        battleLogArea.setLineWrap(true);
+        battleLogArea.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(battleLogArea);
+        scrollPane.setBounds(10, 5, 650, 130);
+        jPanel2.add(scrollPane);
     }
 
 
@@ -650,6 +672,7 @@ public class BattleGUIView extends JFrame {
         new SwingWorker<ImageIcon, Void>() {
             @Override
             protected ImageIcon doInBackground() throws Exception {
+                @SuppressWarnings("deprecation")
                 URL url = new URL(pokemon.getIcon());
                 Image image = ImageIO.read(url);
                 return new ImageIcon(image);
@@ -671,7 +694,10 @@ public class BattleGUIView extends JFrame {
     // Método para seleccionar un nuevo Pokémon
     private void selectPokemon(int trainer, int pokemonIndex) {
         if (trainer == 0) {
+            String oldPokemon = trainers[0].getPokemonTeam().get(x).getName();
             x = (byte)pokemonIndex;
+            String newPokemon = trainers[0].getPokemonTeam().get(x).getName();
+            battleHistory.logPokemonChange(trainer, oldPokemon, newPokemon);
             pokemonSelectionPanel1.setVisible(false);
             if (trainers[0].getPokemonTeam().get(x).getHp() > 0) {
                 attack1_1.setVisible(true);
@@ -693,7 +719,10 @@ public class BattleGUIView extends JFrame {
                 enableTrainer1Attacks();
             }
         } else {
+            String oldPokemon = trainers[1].getPokemonTeam().get(y).getName();
             y = (byte)pokemonIndex;
+            String newPokemon = trainers[1].getPokemonTeam().get(y).getName();
+            battleHistory.logPokemonChange(trainer, oldPokemon, newPokemon);
             pokemonSelectionPanel2.setVisible(false);
             if (trainers[1].getPokemonTeam().get(y).getHp() > 0) {
                 attack2_1.setVisible(true);
@@ -1101,16 +1130,26 @@ public class BattleGUIView extends JFrame {
         }.execute();
     }
 
-    public void attackBySpeed() {
+        public void attackBySpeed() {
         Pokemon _pokemon1 = trainers[0].getPokemonTeam().get(x);
         Pokemon _pokemon2 = trainers[1].getPokemonTeam().get(y);
-
-        // Determina quién ataca primero basado en la velocidad
+        
+        // Registrar qué Pokémon están en batalla
+        battleHistory.logPokemonSent(0, _pokemon1.getName());
+        battleHistory.logPokemonSent(1, _pokemon2.getName());
+        
+        int damage1 = _pokemon1.getMoves().get(moveTrainer1).getPower();
+        int damage2 = _pokemon2.getMoves().get(moveTrainer2).getPower();
+        
         if (_pokemon1.getSpeed() >= _pokemon2.getSpeed()) {
             // Pokemon 1 ataca primero
+            battleHistory.logMoveSelection(0, _pokemon1.getName(), 
+                _pokemon1.getMoves().get(moveTrainer1).getName());
             _pokemon1.movement(_pokemon2, moveTrainer1);
-            
-            // Actualiza la hp del Pokemon 2 y verifica si murió
+            battleHistory.logAttack(_pokemon1.getName(), 
+                _pokemon1.getMoves().get(moveTrainer1).getName(), 
+                _pokemon2.getName(), damage1, _pokemon2.getHp());
+                
             if (_pokemon2.getHp() <= 0) {
                 _pokemon2.setHp((short)0);
                 healthBar2.setHP(0);
@@ -1123,13 +1162,21 @@ public class BattleGUIView extends JFrame {
                 attack2_4.setVisible(false);
                 pokemonSelectionPanel2.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                battleHistory.logPokemonFainted(_pokemon2.getName());
                 checkBattleState();
                 enableTrainer1Attacks();
             } else {
                 healthBar2.setHP(_pokemon2.getHp());
                 hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
-                _pokemon2.movement(_pokemon1, moveTrainer2);
                 
+                // Pokemon 2 contraataca
+                battleHistory.logMoveSelection(1, _pokemon2.getName(), 
+                    _pokemon2.getMoves().get(moveTrainer2).getName());
+                _pokemon2.movement(_pokemon1, moveTrainer2);
+                battleHistory.logAttack(_pokemon2.getName(), 
+                    _pokemon2.getMoves().get(moveTrainer2).getName(), 
+                    _pokemon1.getName(), damage2, _pokemon1.getHp());
+                    
                 if (_pokemon1.getHp() <= 0) {
                     _pokemon1.setHp((short)0);
                     healthBar1.setHP(0);
@@ -1142,6 +1189,7 @@ public class BattleGUIView extends JFrame {
                     attack1_4.setVisible(false);
                     pokemonSelectionPanel1.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
+                    battleHistory.logPokemonFainted(_pokemon1.getName());
                     checkBattleState();
                     enableTrainer2Attacks();
                 } else {
@@ -1152,10 +1200,13 @@ public class BattleGUIView extends JFrame {
                 }
             }
         } else {
-            // Pokemon 2 ataca primero
+            // Pokemon 2 ataca primero (implementación similar al bloque anterior)
+            battleHistory.logMoveSelection(1, _pokemon2.getName(), 
+                _pokemon2.getMoves().get(moveTrainer2).getName());
             _pokemon2.movement(_pokemon1, moveTrainer2);
-            
-            // Actualiza la hp del Pokemon 1 y verifica si murió
+            battleHistory.logAttack(_pokemon2.getName(), 
+                _pokemon2.getMoves().get(moveTrainer2).getName(), 
+                _pokemon1.getName(), damage2, _pokemon1.getHp());
             if (_pokemon1.getHp() <= 0) {
                 _pokemon1.setHp((short)0);
                 healthBar1.setHP(0);
@@ -1168,13 +1219,21 @@ public class BattleGUIView extends JFrame {
                 attack1_4.setVisible(false);
                 pokemonSelectionPanel1.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
+                battleHistory.logPokemonFainted(_pokemon1.getName());
                 checkBattleState();
                 enableTrainer2Attacks();
             } else {
                 healthBar1.setHP(_pokemon1.getHp());
                 hpLabel1.setText(String.valueOf(_pokemon1.getHp()));
+                
+                // Pokemon 1 contraataca
+                battleHistory.logMoveSelection(0, _pokemon1.getName(), 
+                    _pokemon1.getMoves().get(moveTrainer1).getName());
                 _pokemon1.movement(_pokemon2, moveTrainer1);
-
+                battleHistory.logAttack(_pokemon1.getName(), 
+                    _pokemon1.getMoves().get(moveTrainer1).getName(), 
+                    _pokemon2.getName(), damage1, _pokemon2.getHp());
+                    
                 if (_pokemon2.getHp() <= 0) {
                     _pokemon2.setHp((short)0);
                     healthBar2.setHP(0);
@@ -1187,27 +1246,40 @@ public class BattleGUIView extends JFrame {
                     attack2_4.setVisible(false);
                     pokemonSelectionPanel2.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                    battleHistory.logPokemonFainted(_pokemon2.getName());
                     checkBattleState();
                     enableTrainer1Attacks();
                 } else {
                     healthBar2.setHP(_pokemon2.getHp());
                     hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
-                    enableTrainer2Attacks();
                     enableTrainer1Attacks();
+                    enableTrainer2Attacks();
                 }
-            }
+            }       
+        }
+        
+        // Verificar si la batalla ha terminado
+        boolean trainer1Dead = trainers[0].getPokemonTeam().stream().noneMatch(p -> p.getHp() > 0);
+        boolean trainer2Dead = trainers[1].getPokemonTeam().stream().noneMatch(p -> p.getHp() > 0);
+        
+        if (trainer1Dead || trainer2Dead) {
+            String winner = trainer1Dead ? trainers[1].getName() : trainers[0].getName();
+            battleHistory.logBattleEnd(winner);
+            battleHistory.saveBattleHistory();
+            
         }
         
         // Reinicia los movimientos seleccionados
         moveTrainer1 = -1;
         moveTrainer2 = -1;
-
         deselectAllButtons();
     }
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        EventQueue.invokeLater(() -> new BattleGUIView().setVisible(true));
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
