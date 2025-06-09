@@ -7,7 +7,8 @@ Camilo Andres Riscanevo Cotrina - 202459753
 Karen Andrea Sanabria Gonzalez - 202459413
 <br>
 <br> 
-#Estructuras
+# Estructuras
+<br>
 <br>
 Para el historial de los movimienros realizados en la batalla se ha usado una pila Stack<String> la cual se usa para guardar los eventos que ocurren durante la batalla Pokémon, como ataques, cambios de Pokémon y el inicio o fin de la batalla. Cada vez que ocurre un evento, se guarda una línea con la hora y la descripción en la parte superior de la pila. Esta estructura sigue el orden LIFO (último en entrar, primero en salir), lo que permite acceder fácilmente al último evento registrado.
 <br>
