@@ -29,9 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingWorker;
@@ -43,7 +41,7 @@ import Model.Trainer;
 import Model.BattleHistory;
 import Model.Pokemon;
 import javax.swing.JSeparator;
-import javax.swing.JTextArea;
+
 
 /**
  *
@@ -59,7 +57,6 @@ public class BattleGUIView extends JFrame {
     public byte y = 0;
 
     private BattleHistory battleHistory;
-    private JTextArea battleLogArea;
     class PokemonHealthBar extends JPanel {
         private float currentHP;
         private final float maxHP;
@@ -159,18 +156,7 @@ public class BattleGUIView extends JFrame {
         initializePokemonSelection();
         loadPokemonImage();
         loadPokemonImage2();
-        initializeBattleLogPanel();
-    }
-    
-    private void initializeBattleLogPanel() {
-        battleLogArea = new JTextArea(8, 60);
-        battleLogArea.setEditable(false);
-        battleLogArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        battleLogArea.setLineWrap(true);
-        battleLogArea.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(battleLogArea);
-        scrollPane.setBounds(10, 5, 650, 130);
-        jPanel2.add(scrollPane);
+        
     }
 
 
