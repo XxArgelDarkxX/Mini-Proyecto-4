@@ -212,12 +212,4 @@ public class Pokemon {
     public String getMoveName(byte moveIndex) {
         return moves.get(moveIndex).getName();
     }
-
-    public String getMaxHp() {
-        // TODO Auto-generated method stub
-        //usar la api de pokemon para obtener el maximo hp del pokemon
-        return String.valueOf(calculateHP((short) 85, level)); // Ejemplo de HP base
-    }
-
-
 }

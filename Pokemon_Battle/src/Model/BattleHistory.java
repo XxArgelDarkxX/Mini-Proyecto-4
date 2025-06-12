@@ -10,13 +10,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class BattleHistory {
-    private final Stack<String> historyStack = new Stack<>();
-    private final String battleId;
+    
+    // Atributos
+    private final Stack<String> historyStack = new Stack<>(); // Pila para almacenar el historial de acciones
+    private final String battleId; // ID único de la batalla
     private final String trainer1Name;
     private final String trainer2Name;
-    private static final String HISTORY_DIRECTORY = "BattleHistories";
-    private static final String GLOBAL_HISTORY_FILE = "MovementHistory.txt";
+    private static final String HISTORY_DIRECTORY = "BattleHistories"; // Directorio para guardar los historiales de batalla
+    private static final String GLOBAL_HISTORY_FILE = "MovementHistory.txt"; // Archivo para el historial global de movimientos
 
+    // Constructor
     public BattleHistory(String trainer1Name, String trainer2Name) {
         this.trainer1Name = trainer1Name;
         this.trainer2Name = trainer2Name;
@@ -24,15 +27,17 @@ public class BattleHistory {
         ensureDirectoryExists();
     }
 
+    // Genera un ID único para la batalla basado en la fecha y hora actual
     private String generateBattleId() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"); // Formato de fecha y hora
         return "Battle_" + LocalDateTime.now().format(formatter);
     }
 
+    // Asegura que el directorio de historiales exista
     private void ensureDirectoryExists() {
-        File directory = new File(HISTORY_DIRECTORY);
-        if (!directory.exists()) {
-            directory.mkdir();
+        File directory = new File(HISTORY_DIRECTORY); // Crea el directorio si no existe
+        if (!directory.exists()) { 
+            directory.mkdir(); 
         }
     }
 
@@ -41,35 +46,43 @@ public class BattleHistory {
         addAction("INICIO: Batalla entre " + trainer1Name + " y " + trainer2Name);
     }
 
+    // Registra el envío de un Pokémon por parte de un entrenador
     public void logPokemonSent(int trainer, String pokemonName) {
         addAction(getTrainerName(trainer) + " envía a " + pokemonName);
     }
 
+    // Registra el cambio de Pokémon de un entrenador
     public void logPokemonChange(int trainer, String oldPokemon, String newPokemon) {
         addAction(getTrainerName(trainer) + " cambia de " + oldPokemon + " a " + newPokemon);
     }
 
+    // Registra la selección de un movimiento por parte de un Pokémon
     public void logMoveSelection(int trainer, String pokemonName, String moveName) {
         addAction(getTrainerName(trainer) + " - " + pokemonName + " usa " + moveName);
     }
 
+    // Registra un ataque realizado por un Pokémon
     public void logAttack(String attacker, String move, String defender, int damage, int remainingHP) {
         addAction(String.format("ATAQUE: %s usa %s contra %s - Daño: %d - HP restante: %d", 
                 attacker, move, defender, damage, remainingHP));
     }
 
+    // Registra que un Pokémon se ha debilitado
     public void logPokemonFainted(String pokemonName) {
         addAction("¡" + pokemonName + " se ha debilitado!");
     }
 
+    // Registra el final de la batalla y quién ha ganado
     public void logBattleEnd(String winnerName) {
         addAction("FIN: ¡" + winnerName + " gana la batalla!");
     }
 
+    // Método auxiliar para obtener el nombre del entrenador según su índice
     private String getTrainerName(int trainer) {
         return trainer == 0 ? trainer1Name : trainer2Name;
     }
 
+    // Método auxiliar para agregar una acción al historial con un timestamp
     private void addAction(String action) {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
         String logEntry = "[" + timestamp + "] " + action;
@@ -95,11 +108,13 @@ public class BattleHistory {
         appendToGlobalHistory();
     }
 
+    // Guarda el historial de la batalla en un archivo individual y en el historial global
     private void saveIndividualBattleFile() {
         String filename = HISTORY_DIRECTORY + File.separator + battleId + ".txt";
         saveToFile(filename, getHistoryAsText());
     }
 
+    // Agrega el historial de la batalla al historial global de movimientos
     private void appendToGlobalHistory() {
         try (FileWriter fw = new FileWriter(HISTORY_DIRECTORY + File.separator + GLOBAL_HISTORY_FILE, true);
              BufferedWriter bw = new BufferedWriter(fw);
@@ -118,6 +133,7 @@ public class BattleHistory {
         }
     }
 
+    // Método auxiliar para guardar el historial en un archivo
     private void saveToFile(String filename, String content) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             writer.println(content);
@@ -126,6 +142,7 @@ public class BattleHistory {
         }
     }
 
+    // Método para limpiar el historial de batalla
     public void clearHistory() {
         historyStack.clear();
     }
