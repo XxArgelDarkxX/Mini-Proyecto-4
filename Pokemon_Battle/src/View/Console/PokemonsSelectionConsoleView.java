@@ -2,6 +2,8 @@ package View.Console;
 
 import Controller.BattleController;
 import Controller.PokemonsSelectionController;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.Pokemon;
 import Model.Trainer;
 import View.GUI.BattleGUIView;

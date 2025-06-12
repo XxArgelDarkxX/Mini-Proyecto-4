@@ -41,6 +41,8 @@ import javax.swing.WindowConstants;
 
 import Controller.BattleController;
 import Model.Trainer;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.GameStateManager;
 import Model.BattleHistory;
 import Model.Pokemon;
@@ -175,7 +177,7 @@ public class BattleGUIView extends JFrame {
         loadPokemonImage2();
     }
 
-    public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) {
+    public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) throws quantityCheckException, pokemonNotFoundException {
         this.pokemonsBattle = pokemonsBattle;
         this.trainers = trainers;
         this.gameStateManager = new GameStateManager();
@@ -188,6 +190,7 @@ public class BattleGUIView extends JFrame {
         initComponents();
         initializePokemonSelection();
         initializeSaveButton();
+        initializeHistoryButton();
         loadPokemonImage();
         loadPokemonImage2();
         
@@ -495,7 +498,6 @@ public class BattleGUIView extends JFrame {
             }
         });
 
-
         
         GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -634,6 +636,7 @@ public class BattleGUIView extends JFrame {
         victoryPanel.setVisible(false);
     }
 
+
     private void initializeSaveButton() {
         saveGameButton = new JButton("Guardar Partida");
         saveGameButton.setBackground(new Color(102, 178, 255));
@@ -642,7 +645,15 @@ public class BattleGUIView extends JFrame {
         saveGameButton.addActionListener(e -> saveGame());
         jPanel2.add(saveGameButton);
     }
-
+    
+    private void initializeHistoryButton() {
+        historyButton = new JButton("Historial de Batalla");
+        historyButton.setBackground(new Color(102, 178, 255));
+        historyButton.setForeground(Color.WHITE);
+        historyButton.setBounds(140, 10, 120, 30);
+        historyButton.addActionListener(e -> showBattleHistory());
+        jPanel2.add(historyButton);
+    }
     private void createStylizedBorder(int x, int y, int width, int height, boolean isHorizontal, boolean isCentralSeparator, boolean isBottom, boolean isRight) {
         // Capa base (más oscura)
         JSeparator baseBorder = new JSeparator(isHorizontal ? JSeparator.HORIZONTAL : JSeparator.VERTICAL);
@@ -1357,6 +1368,10 @@ public class BattleGUIView extends JFrame {
         }
     }
 
+    private void showBattleHistory() {
+        
+    }
+
     public void setPokemonBattle(PokemonBattle pokemonBattle) {
         this.pokemonBattle = pokemonBattle;
         
@@ -1461,6 +1476,7 @@ public class BattleGUIView extends JFrame {
     private PokemonHealthBar healthBar1;
     private PokemonHealthBar healthBar2;
     private JButton saveGameButton;
+    private JButton historyButton;
     // End of variables declaration
 
     class BackgroundPanel extends JPanel{

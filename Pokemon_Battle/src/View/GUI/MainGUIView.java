@@ -1,20 +1,20 @@
 package View.GUI;
 
+import Controller.MainController;
+import Controller.TrainerController;
+import Model.Exceptions.pokemonBattle.indexErrorException;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
+import Model.GameStateManager;
+import Model.PokemonBattle;
 import View.Interfaces.MainView;
 import View.Utils.MusicPlayer;
 import View.Utils.ViewChangeButton;
-import View.Console.MainConsoleView;
-import Controller.MainController;
-import Controller.TrainerController;
-import Model.GameStateManager;
-import Model.PokemonBattle;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -106,7 +106,14 @@ public class MainGUIView extends JFrame implements MainView {
 
         loadGameButton.setBackground(new Color(102, 178, 255));
         loadGameButton.setForeground(Color.WHITE);
-        loadGameButton.addActionListener(e -> loadGame());
+        loadGameButton.addActionListener(e -> {
+            try {
+                loadGame();
+            } catch (quantityCheckException | pokemonNotFoundException | indexErrorException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        });
         loadGameButton.setFont(new java.awt.Font("Roboto Black", 3, 18)); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -193,7 +200,7 @@ public class MainGUIView extends JFrame implements MainView {
         trainerController.initialize();
     }
 
-    private void loadGame() {
+    private void loadGame() throws quantityCheckException, pokemonNotFoundException, indexErrorException {
         String[] savedGames = gameStateManager.listSavedGames();
         
         if (savedGames.length == 0) {

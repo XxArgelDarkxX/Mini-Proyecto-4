@@ -8,7 +8,8 @@ import Controller.PokemonsSelectionController;
 import View.Interfaces.PokemonsSelectionView;
 import View.Utils.ViewChangeButton;
 import Model.Trainer;
-import View.Console.PokemonsSelectionConsoleView;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import View.Utils.MusicPlayer;
 
 import java.awt.Color;
@@ -260,7 +261,13 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
         playMusic("Pokémon-Black-_-White-Elite-Four-Battle-Music-_HQ_.wav");
 
          // ID del segundo pokemon
-        BattleGUIView battleView = new BattleGUIView(trainers, selectedPokemon);
+        BattleGUIView battleView = null;
+        try {
+            battleView = new BattleGUIView(trainers, selectedPokemon);
+        } catch (quantityCheckException | pokemonNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         battleView.setVisible(true);
     }
 
