@@ -27,10 +27,17 @@ public class BattleHistory {
         ensureDirectoryExists();
     }
 
-    // Genera un ID único para la batalla basado en la fecha y hora actual
+    // Genera un ID único para la batalla 
     private String generateBattleId() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"); // Formato de fecha y hora
-        return "Battle_" + LocalDateTime.now().format(formatter);
+        File historyDir = new File(HISTORY_DIRECTORY);
+        if (!historyDir.exists() || historyDir.listFiles((dir, name) -> name.startsWith("Battle_1") && name.endsWith(".txt")).length == 0 || historyDir.listFiles((dir, name) -> name.startsWith("Battle_") && name.endsWith(".txt")).length == 0) {
+            System.out.println("hola desde battle 1");
+            return "Battle_1"; // Si es la primera batalla, asigna el ID Battle_1
+        } else {
+            System.out.println("hola desde battle 2");
+            int lastBattleId = historyDir.listFiles((dir, name) -> name.startsWith("Battle_") && name.endsWith(".txt")).length; // Cuenta los archivos que cumplen con el patrón
+            return "Battle_" + (lastBattleId + 1); // Incrementa el ID de la última batalla
+        }
     }
 
     // Asegura que el directorio de historiales exista
@@ -77,15 +84,14 @@ public class BattleHistory {
         addAction("FIN: ¡" + winnerName + " gana la batalla!");
     }
 
-    // Método auxiliar para obtener el nombre del entrenador según su índice
+    // Método para obtener el nombre del entrenador según su índice
     private String getTrainerName(int trainer) {
         return trainer == 0 ? trainer1Name : trainer2Name;
     }
 
-    // Método auxiliar para agregar una acción al historial con un timestamp
+    // Método para agregar una acción al historial 
     private void addAction(String action) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        String logEntry = "[" + timestamp + "] " + action;
+        String logEntry = action;
         historyStack.push(logEntry);
     }
 
@@ -142,8 +148,6 @@ public class BattleHistory {
         }
     }
 
-    // Método para limpiar el historial de batalla
-    public void clearHistory() {
-        historyStack.clear();
-    }
+    
+
 }

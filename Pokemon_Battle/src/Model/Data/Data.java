@@ -254,11 +254,11 @@ public class Data {
 
         addPokemonToMaps(starmie);
 
-        Pokemon cloystera = new Pokemon("91", "Cloyster", Type.AGUA, 
-            (short)50, (short)95, (short)85, (short)180, 
-            (short)45, (short)70, new ArrayList<>(waterMoves.subList(0, 4)));
+        Pokemon kingler = new Pokemon("99", "Kingler", Type.AGUA, 
+            (short)55, (short)130, (short)50, (short)115, 
+            (short)50, (short)75, new ArrayList<>(waterMoves.subList(0, 4)));
 
-        addPokemonToMaps(cloystera);
+        addPokemonToMaps(kingler);
 
         // Pokémon tipo Planta
     
@@ -268,11 +268,11 @@ public class Data {
 
         addPokemonToMaps(venusaur);
 
-        Pokemon victreebelp = new Pokemon("71", "Victreebel", Type.PLANTA, 
+        Pokemon victreebel = new Pokemon("71", "Victreebel", Type.PLANTA, 
             (short)80, (short)105, (short)100, (short)65, 
             (short)70, (short)70, new ArrayList<>(grassMoves.subList(1, 5)));
 
-        addPokemonToMaps(victreebelp);
+        addPokemonToMaps(victreebel);
 
         Pokemon vileplume = new Pokemon("45", "Vileplume", Type.PLANTA, 
             (short)75, (short)80, (short)100, (short)85, 
@@ -318,11 +318,11 @@ public class Data {
         
         addPokemonToMaps(zapdos);
 
-        Pokemon magnetone = new Pokemon("82", "Magneton", Type.ELECTRICO, 
-            (short)50, (short)60, (short)120, (short)95, 
-            (short)70, (short)70, new ArrayList<>(electricMoves.subList(0, 4)));
+        Pokemon ampharos = new Pokemon("181", "Ampharos", Type.ELECTRICO, 
+            (short)90, (short)75, (short)115, (short)85, 
+            (short)90, (short)55, new ArrayList<>(electricMoves.subList(0, 4)));
 
-        addPokemonToMaps(magnetone);
+        addPokemonToMaps(ampharos);
 
         // Pokémon tipo Volador
 
@@ -344,11 +344,11 @@ public class Data {
 
         addPokemonToMaps(aerodactyl);
 
-        Pokemon scytherv = new Pokemon("123", "Scyther", Type.VOLADOR, 
-            (short)70, (short)110, (short)55, (short)80, 
-            (short)80, (short)105, new ArrayList<>(flyingMoves.subList(1, 5)));
+        Pokemon farfetchd = new Pokemon("83", "Farfetch'd", Type.VOLADOR, 
+            (short)52, (short)90, (short)58, (short)55, 
+            (short)62, (short)60, new ArrayList<>(flyingMoves.subList(1, 5)));
 
-        addPokemonToMaps(scytherv);
+        addPokemonToMaps(farfetchd);
 
         Pokemon dodrio = new Pokemon("85", "Dodrio", Type.VOLADOR, 
             (short)60, (short)110, (short)60, (short)70, 
@@ -408,11 +408,11 @@ public class Data {
 
         addPokemonToMaps(dewgong);
 
-        Pokemon cloysterh = new Pokemon("91", "Cloyster", Type.HIELO, 
+        Pokemon cloyster = new Pokemon("91", "Cloyster", Type.HIELO, 
             (short)50, (short)95, (short)85, (short)180, 
             (short)45, (short)70, new ArrayList<>(iceMoves.subList(1, 5)));
         
-        addPokemonToMaps(cloysterh);
+        addPokemonToMaps(cloyster);
 
         Pokemon lapras = new Pokemon("131", "Lapras", Type.HIELO, 
             (short)130, (short)85, (short)85, (short)80, 
@@ -440,11 +440,11 @@ public class Data {
 
         addPokemonToMaps(pinsir);
 
-        Pokemon scytherb = new Pokemon("123", "Scyther", Type.BICHO, 
+        Pokemon scyther = new Pokemon("123", "Scyther", Type.BICHO, 
             (short)70, (short)110, (short)55, (short)80, 
             (short)80, (short)105, new ArrayList<>(bugMoves.subList(1, 5)));
         
-        addPokemonToMaps(scytherb);
+        addPokemonToMaps(scyther);
 
         Pokemon parasect = new Pokemon("47", "Parasect", Type.BICHO, 
             (short)60, (short)95, (short)60, (short)80, 
@@ -454,11 +454,11 @@ public class Data {
 
         // Pokémon tipo Roca
 
-        Pokemon golemr = new Pokemon("76", "Golem", Type.ROCA, 
+        Pokemon golem = new Pokemon("76", "Golem", Type.ROCA, 
             (short)80, (short)120, (short)55, (short)130, 
             (short)65, (short)45, new ArrayList<>(rockMoves.subList(0, 4)));
 
-        addPokemonToMaps(golemr);
+        addPokemonToMaps(golem);
 
         Pokemon rhydon = new Pokemon("112", "Rhydon", Type.ROCA, 
             (short)105, (short)130, (short)45, (short)120, 
@@ -478,19 +478,19 @@ public class Data {
 
         addPokemonToMaps(kabutops);
 
-        Pokemon aerodactylr = new Pokemon("142", "Aerodactyl", Type.ROCA, 
-            (short)80, (short)105, (short)60, (short)65, 
-            (short)75, (short)130, new ArrayList<>(rockMoves.subList(0, 4)));
+        Pokemon onix = new Pokemon("95", "Onix", Type.ROCA, 
+            (short)35, (short)45, (short)30, (short)160, 
+            (short)45, (short)70, new ArrayList<>(rockMoves.subList(0, 4)));
 
-        addPokemonToMaps(aerodactylr);
+        addPokemonToMaps(onix);
 
         // Pokémon tipo Fantasma
 
-        Pokemon gengarf = new Pokemon("94", "Gengar", Type.FANTASMA, 
+        Pokemon gengar = new Pokemon("94", "Gengar", Type.FANTASMA, 
             (short)60, (short)65, (short)130, (short)60, 
             (short)75, (short)110, new ArrayList<>(ghostMoves.subList(0, 4)));
 
-        addPokemonToMaps(gengarf);
+        addPokemonToMaps(gengar);
 
         Pokemon haunter = new Pokemon("93", "Haunter", Type.FANTASMA, 
             (short)45, (short)50, (short)115, (short)45, 
@@ -576,11 +576,11 @@ public class Data {
 
         // Pokémon tipo Siniestro
 
-        Pokemon gengars = new Pokemon("94", "Gengar", Type.SINIESTRO, 
-            (short)60, (short)65, (short)130, (short)60, 
-            (short)75, (short)110, new ArrayList<>(darkMoves.subList(0, 4)));
+        Pokemon umbreon = new Pokemon("197", "Umbreon", Type.SINIESTRO, 
+            (short)95, (short)65, (short)60, (short)110, 
+            (short)130, (short)65, new ArrayList<>(darkMoves.subList(0, 4)));
 
-        addPokemonToMaps(gengars);
+        addPokemonToMaps(umbreon);
 
         Pokemon houndoom = new Pokemon("229", "Houndoom", Type.SINIESTRO, 
             (short)75, (short)90, (short)50, (short)110, 
@@ -652,11 +652,12 @@ public class Data {
 
         addPokemonToMaps(arbok);
 
-        Pokemon victreebelv = new Pokemon("71", "Victreebel", Type.VENENO, 
-            (short)80, (short)105, (short)100, (short)65, 
-            (short)70, (short)70, new ArrayList<>(poisonMoves.subList(1, 5)));
+        // Reemplazado: Victreebel tipo Veneno por Crobat tipo Veneno
+        Pokemon crobat = new Pokemon("169", "Crobat", Type.VENENO, 
+            (short)85, (short)90, (short)70, (short)80, 
+            (short)80, (short)130, new ArrayList<>(poisonMoves.subList(1, 5)));
 
-        addPokemonToMaps(victreebelv);
+        addPokemonToMaps(crobat);
 
         Pokemon nidoking = new Pokemon("34", "Nidoking", Type.VENENO, 
             (short)81, (short)102, (short)85, (short)77, 
@@ -666,11 +667,11 @@ public class Data {
 
         // Pokémon tipo Acero
 
-        Pokemon magnetona = new Pokemon("82", "Magneton", Type.ACERO, 
+        Pokemon magneton = new Pokemon("82", "Magneton", Type.ACERO, 
             (short)50, (short)60, (short)120, (short)95, 
             (short)70, (short)70, new ArrayList<>(steelMoves.subList(0, 4)));
 
-        addPokemonToMaps(magnetona);
+        addPokemonToMaps(magneton);
 
         Pokemon magnemite = new Pokemon("81", "Magnemite", Type.ACERO, 
             (short)25, (short)35, (short)95, (short)70, 
@@ -715,12 +716,16 @@ public class Data {
             (short)70, (short)120, new ArrayList<>(groundMoves.subList(0, 4)));
 
         addPokemonToMaps(dugtrio);
+    
 
-        Pokemon golemt = new Pokemon("76", "Golem", Type.TIERRA, 
-            (short)80, (short)120, (short)55, (short)130, 
-            (short)65, (short)45, new ArrayList<>(groundMoves.subList(1, 5)));
 
-        addPokemonToMaps(golemt);
+
+        
+        Pokemon donphan = new Pokemon("232", "Donphan", Type.TIERRA, 
+            (short)90, (short)120, (short)60, (short)120, 
+            (short)60, (short)50, new ArrayList<>(groundMoves.subList(1, 5)));
+
+        addPokemonToMaps(donphan);
 
         Pokemon rhyhorn = new Pokemon("111", "Rhyhorn", Type.TIERRA, 
             (short)80, (short)85, (short)95, (short)30, 

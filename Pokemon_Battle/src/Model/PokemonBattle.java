@@ -104,11 +104,13 @@ public class PokemonBattle {
             executeAttack(pokemon1, pokemon2, trainer1Move, result, true);
             if (!result.isPokemon2Fainted()) {
                 executeAttack(pokemon2, pokemon1, trainer2Move, result, false);
+                battleHistory.saveBattleHistory();
             }
         } else {
             executeAttack(pokemon2, pokemon1, trainer2Move, result, false);
             if (!result.isPokemon1Fainted()) {
                 executeAttack(pokemon1, pokemon2, trainer1Move, result, true);
+                battleHistory.saveBattleHistory();
             }
         }
         

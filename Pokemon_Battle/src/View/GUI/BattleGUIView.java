@@ -1135,12 +1135,14 @@ public class BattleGUIView extends JFrame {
             battleHistory.logAttack(_pokemon1.getName(), 
                 _pokemon1.getMoves().get(moveTrainer1).getName(), 
                 _pokemon2.getName(), damage1, _pokemon2.getHp());
+            battleHistory.saveBattleHistory();
                 
             if (_pokemon2.getHp() <= 0) {
                 _pokemon2.setHp((short)0);
                 healthBar2.setHP(0);
                 hpLabel2.setText("0");
                 ImageUrl2.setIcon(null);
+                disableTrainer1Attacks();
                 disableTrainer2Attacks();
                 attack2_1.setVisible(false);
                 attack2_2.setVisible(false);
@@ -1151,6 +1153,7 @@ public class BattleGUIView extends JFrame {
                 battleHistory.logPokemonFainted(_pokemon2.getName());
                 checkBattleState();
                 enableTrainer1Attacks();
+                battleHistory.saveBattleHistory();
             } else {
                 healthBar2.setHP(_pokemon2.getHp());
                 hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
@@ -1162,6 +1165,7 @@ public class BattleGUIView extends JFrame {
                 battleHistory.logAttack(_pokemon2.getName(), 
                     _pokemon2.getMoves().get(moveTrainer2).getName(), 
                     _pokemon1.getName(), damage2, _pokemon1.getHp());
+                battleHistory.saveBattleHistory();
                     
                 if (_pokemon1.getHp() <= 0) {
                     _pokemon1.setHp((short)0);
@@ -1169,6 +1173,7 @@ public class BattleGUIView extends JFrame {
                     hpLabel1.setText("0");
                     imageUrl.setIcon(null);
                     disableTrainer1Attacks();
+                    disableTrainer2Attacks();
                     attack1_1.setVisible(false);
                     attack1_2.setVisible(false);
                     attack1_3.setVisible(false);
@@ -1178,15 +1183,17 @@ public class BattleGUIView extends JFrame {
                     battleHistory.logPokemonFainted(_pokemon1.getName());
                     checkBattleState();
                     enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 } else {
                     healthBar1.setHP(_pokemon1.getHp());
                     hpLabel1.setText(String.valueOf(_pokemon1.getHp()));
                     enableTrainer1Attacks();
                     enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 }
             }
         } else {
-            // Pokemon 2 ataca primero (implementación similar al bloque anterior)
+            // Pokemon 2 ataca primero
             battleHistory.logMoveSelection(1, _pokemon2.getName(), 
                 _pokemon2.getMoves().get(moveTrainer2).getName());
             _pokemon2.movement(_pokemon1, moveTrainer2);
@@ -1208,6 +1215,7 @@ public class BattleGUIView extends JFrame {
                 battleHistory.logPokemonFainted(_pokemon1.getName());
                 checkBattleState();
                 enableTrainer2Attacks();
+                battleHistory.saveBattleHistory();
             } else {
                 healthBar1.setHP(_pokemon1.getHp());
                 hpLabel1.setText(String.valueOf(_pokemon1.getHp()));
@@ -1219,6 +1227,7 @@ public class BattleGUIView extends JFrame {
                 battleHistory.logAttack(_pokemon1.getName(), 
                     _pokemon1.getMoves().get(moveTrainer1).getName(), 
                     _pokemon2.getName(), damage1, _pokemon2.getHp());
+                battleHistory.saveBattleHistory();
                     
                 if (_pokemon2.getHp() <= 0) {
                     _pokemon2.setHp((short)0);
@@ -1235,11 +1244,13 @@ public class BattleGUIView extends JFrame {
                     battleHistory.logPokemonFainted(_pokemon2.getName());
                     checkBattleState();
                     enableTrainer1Attacks();
+                    battleHistory.saveBattleHistory();
                 } else {
                     healthBar2.setHP(_pokemon2.getHp());
                     hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
                     enableTrainer1Attacks();
                     enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 }
             }       
         }
