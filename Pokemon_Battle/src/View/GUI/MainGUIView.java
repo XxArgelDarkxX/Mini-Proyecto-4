@@ -117,12 +117,12 @@ public class MainGUIView extends JFrame implements MainView {
         loadGameButton.setFont(new java.awt.Font("Roboto Black", 3, 18)); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.ipady = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(100, 20, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(60, 400, 0, 0);
         jPanel1.add(loadGameButton, gridBagConstraints);
 
         background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg"))); // NOI18N

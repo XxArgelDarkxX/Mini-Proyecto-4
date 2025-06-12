@@ -111,7 +111,6 @@ public class BattleHistory {
     // Métodos para guardar el historial
     public void saveBattleHistory() {
         saveIndividualBattleFile();
-        appendToGlobalHistory();
     }
 
     // Guarda el historial de la batalla en un archivo individual y en el historial global
@@ -121,23 +120,6 @@ public class BattleHistory {
     }
 
     // Agrega el historial de la batalla al historial global de movimientos
-    private void appendToGlobalHistory() {
-        try (FileWriter fw = new FileWriter(HISTORY_DIRECTORY + File.separator + GLOBAL_HISTORY_FILE, true);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
-             
-            out.println("\n════════ " + battleId + " ════════");
-            out.println("Entrenadores: " + trainer1Name + " vs " + trainer2Name);
-            out.println("Fecha: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-            out.println();
-            
-            for (String action : historyStack) {
-                out.println(action);
-            }
-        } catch (IOException e) {
-            System.err.println("Error al escribir en el historial global: " + e.getMessage());
-        }
-    }
 
     // Método auxiliar para guardar el historial en un archivo
     private void saveToFile(String filename, String content) {

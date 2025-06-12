@@ -1371,7 +1371,19 @@ public class BattleGUIView extends JFrame {
     }
 
     private void showBattleHistory() {
-        
+        String history = battleHistory.getHistoryAsText();
+        if (history.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "No hay historial de batalla disponible.",
+                "Historial de Batalla",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            HistoryBattle historyDialog = new HistoryBattle(history);
+            historyDialog.setLocationRelativeTo(this);
+            historyDialog.setVisible(true);
+        }
     }
 
     public void setPokemonBattle(PokemonBattle pokemonBattle) {

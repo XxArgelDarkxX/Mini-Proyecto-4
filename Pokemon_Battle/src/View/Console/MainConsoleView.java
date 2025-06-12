@@ -23,7 +23,6 @@ public class MainConsoleView implements MainView {
         System.out.println("1. Jugar");
         System.out.println("2. Cambiar a GUI");
         System.out.println("3. Salir");
-        System.out.println("4. Mostrar historial de batallas");
         System.out.print("Seleccione una opción: ");
         while (isRunning) {
             String input = scanner.nextLine();
@@ -37,12 +36,6 @@ public class MainConsoleView implements MainView {
                 case "3" -> {
                     System.out.println("Saliendo del juego...");
                     isRunning = false;
-                }
-                case "4" -> {
-                    BattleHistory history = new BattleHistory("Entrenador1", "Entrenador2");
-                    history.saveBattleHistory();
-                    System.out.println("Historial de batallas:");
-                    System.out.println(history.getHistoryAsText());
                 }
                 default -> System.out.println("Opción no válida. Intente de nuevo.");
             }
