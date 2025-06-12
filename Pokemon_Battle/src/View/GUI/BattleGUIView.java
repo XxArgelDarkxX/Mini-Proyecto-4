@@ -641,18 +641,20 @@ public class BattleGUIView extends JFrame {
         saveGameButton = new JButton("Guardar Partida");
         saveGameButton.setBackground(new Color(102, 178, 255));
         saveGameButton.setForeground(Color.WHITE);
-        saveGameButton.setBounds(10, 10, 120, 30);
+        saveGameButton.setBounds(400, 20, 120, 30);
         saveGameButton.addActionListener(e -> saveGame());
         jPanel2.add(saveGameButton);
+        jPanel2.setComponentZOrder(saveGameButton, 0);
     }
     
     private void initializeHistoryButton() {
         historyButton = new JButton("Historial de Batalla");
         historyButton.setBackground(new Color(102, 178, 255));
         historyButton.setForeground(Color.WHITE);
-        historyButton.setBounds(140, 10, 120, 30);
+        historyButton.setBounds(540, 20, 120, 30);
         historyButton.addActionListener(e -> showBattleHistory());
         jPanel2.add(historyButton);
+        jPanel2.setComponentZOrder(historyButton, 0);
     }
     private void createStylizedBorder(int x, int y, int width, int height, boolean isHorizontal, boolean isCentralSeparator, boolean isBottom, boolean isRight) {
         // Capa base (más oscura)

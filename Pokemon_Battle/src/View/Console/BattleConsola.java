@@ -1,9 +1,11 @@
 package View.Console;
 
+import Controller.BattleController;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.Pokemon;
 import Model.Trainer;
 import java.util.Scanner;
-import Controller.BattleController;
 
 public class BattleConsola {
     private final Trainer[] trainers;
@@ -22,7 +24,7 @@ public class BattleConsola {
         this.battleEnded = false;
     }
 
-    public void startBattle() {
+    public void startBattle() throws quantityCheckException, pokemonNotFoundException {
         System.out.println("\n=== INICIO DE BATALLA POKÉMON ===");
 
         // Selección inicial de Pokémon si no están pre-seleccionados
@@ -109,7 +111,7 @@ public class BattleConsola {
         }
     }
 
-    private void menuBattleOptions() {
+    private void menuBattleOptions() throws quantityCheckException, pokemonNotFoundException {
         System.out.println("\n=== OPCIONES DE BATALLA ===");
         System.out.println("1. Continuar batalla");
         System.out.println("2. Cambiar a interfaz gráfica");

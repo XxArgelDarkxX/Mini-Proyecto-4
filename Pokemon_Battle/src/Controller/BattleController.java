@@ -1,5 +1,7 @@
 package Controller;
 
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.Trainer;
 import View.Interfaces.BattleView;
 
@@ -18,7 +20,7 @@ public class BattleController {
         this.trainers = new Trainer[2];
     }
 
-    public void changeView() {
+    public void changeView() throws quantityCheckException, pokemonNotFoundException {
         if (isGui) {
             // Cambiar de GUI a consola
             View.Console.BattleConsola consola = new View.Console.BattleConsola(trainers, selectedPokemons, this);

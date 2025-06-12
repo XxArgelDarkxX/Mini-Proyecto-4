@@ -5,8 +5,6 @@ import Controller.PokemonsSelectionController;
 import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
 import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.Pokemon;
-import Model.Trainer;
-import View.GUI.BattleGUIView;
 import View.Interfaces.PokemonsSelectionView;
 import View.Utils.MusicPlayer;
 import java.util.Scanner;
@@ -131,7 +129,12 @@ public class PokemonsSelectionConsoleView implements PokemonsSelectionView {
             selectedPokemon[1] = pokemon2Id;
             BattleController battleController = new BattleController(null, false);
             BattleConsola battleView = new BattleConsola(controller.getTrainers(), selectedPokemon,  battleController);
-            battleView.startBattle();
+            try {
+                battleView.startBattle();
+            } catch (quantityCheckException | pokemonNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 }
