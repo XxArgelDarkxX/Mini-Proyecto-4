@@ -1,6 +1,9 @@
 package Model;
 
 import Model.Data.Data;
+import Model.Exceptions.pokemonBattle.indexErrorException;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -37,7 +40,7 @@ public class GameStateManager {
         }
     }
 
-    public PokemonBattle loadGame(String filename) throws IOException {
+    public PokemonBattle loadGame(String filename) throws IOException, quantityCheckException, pokemonNotFoundException, indexErrorException {
         String filepath = SAVE_DIRECTORY + filename + ".txt";
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             Trainer[] trainers = new Trainer[2];

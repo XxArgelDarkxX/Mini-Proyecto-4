@@ -1,6 +1,8 @@
 package View.Console;
 
 import Controller.PokemonsSelectionController;
+import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
+import Model.Exceptions.pokemonBattle.quantityCheckException;
 import Model.Pokemon;
 import View.GUI.BattleGUIView;
 import View.Interfaces.PokemonsSelectionView;
@@ -125,7 +127,13 @@ public class PokemonsSelectionConsoleView implements PokemonsSelectionView {
             String[] selectedPokemon = new String[2];
             selectedPokemon[0] = pokemon1Id;
             selectedPokemon[1] = pokemon2Id;
-            BattleGUIView battleView = new BattleGUIView(controller.getTrainers(), selectedPokemon);
+            BattleGUIView battleView = null;
+            try {
+                battleView = new BattleGUIView(controller.getTrainers(), selectedPokemon);
+            } catch (quantityCheckException | pokemonNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             battleView.setVisible(true);
         }
     }
