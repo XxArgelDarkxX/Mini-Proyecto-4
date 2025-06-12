@@ -6,12 +6,17 @@ import View.Utils.ViewChangeButton;
 import View.Console.MainConsoleView;
 import Controller.MainController;
 import Controller.TrainerController;
+import Model.GameStateManager;
+import Model.PokemonBattle;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.IOException;
+
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,12 +31,14 @@ import javax.swing.JPanel;
  * @author crisc
  */
 public class MainGUIView extends JFrame implements MainView {
+    private GameStateManager gameStateManager;
     private MainController controller;
     /**
      * Creates new form Inicio
      */
     public MainGUIView() {
         initComponents();
+        gameStateManager = new GameStateManager();
 // this.setUndecorated(true); // Opcional: elimina bordes
     }
 
@@ -49,6 +56,7 @@ public class MainGUIView extends JFrame implements MainView {
         playButton = new javax.swing.JToggleButton();
         background = new javax.swing.JLabel();
         changeViewButton = new ViewChangeButton();
+        loadGameButton = new JButton("Cargar Partida");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -86,6 +94,7 @@ public class MainGUIView extends JFrame implements MainView {
                 changeViewButtonActionPerformed(evt);
             }
         });
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -94,6 +103,20 @@ public class MainGUIView extends JFrame implements MainView {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(10, 400, 0, 0);
         jPanel1.add(changeViewButton, gridBagConstraints);
+
+        loadGameButton.setBackground(new Color(102, 178, 255));
+        loadGameButton.setForeground(Color.WHITE);
+        loadGameButton.addActionListener(e -> loadGame());
+        loadGameButton.setFont(new java.awt.Font("Roboto Black", 3, 18)); // NOI18N
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 20;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(100, 20, 0, 0);
+        jPanel1.add(loadGameButton, gridBagConstraints);
 
         background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg"))); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -170,6 +193,58 @@ public class MainGUIView extends JFrame implements MainView {
         trainerController.initialize();
     }
 
+    private void loadGame() {
+        String[] savedGames = gameStateManager.listSavedGames();
+        
+        if (savedGames.length == 0) {
+            JOptionPane.showMessageDialog(
+                this,
+                "No hay partidas guardadas",
+                "Cargar Partida",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+        
+        String selectedGame = (String) JOptionPane.showInputDialog(
+            this,
+            "Selecciona una partida guardada:",
+            "Cargar Partida",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            savedGames,
+            savedGames[0]
+        );
+        
+        if (selectedGame != null) {
+            try {
+                PokemonBattle loadedBattle = gameStateManager.loadGame(selectedGame);
+                
+                // Cerrar la ventana actual
+                this.dispose();
+                
+                // Crear y mostrar la vista de batalla con la partida cargada
+                BattleGUIView battleView = new BattleGUIView(
+                    loadedBattle.getTrainers(),
+                    new String[]{
+                        loadedBattle.getCurrentPokemon(0).getPokedexId(),
+                        loadedBattle.getCurrentPokemon(1).getPokedexId()
+                    }
+                );
+                battleView.setPokemonBattle(loadedBattle);
+                battleView.setVisible(true);
+                
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error al cargar la partida: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
 
     /**
      * @param args the command line arguments
@@ -224,5 +299,6 @@ public class MainGUIView extends JFrame implements MainView {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JToggleButton playButton;
     ViewChangeButton changeViewButton;
+    private JButton loadGameButton;
     // End of variables declaration
 }

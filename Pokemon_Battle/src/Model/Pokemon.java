@@ -5,6 +5,7 @@ public class Pokemon {
     private String pokedexId;
     private String name;
     private Type type;
+    private short maxHp;
     private short hp;
     private short level = 50; // Nivel por defecto de los Pokemon
     private short attack;
@@ -48,6 +49,7 @@ public class Pokemon {
         this.name = name;
         this.type = type;
         this.hp = calculateHP(baseHp, level);
+        this.maxHp = this.hp; // Inicialmente el HP es igual al max HP.
         this.attack = calculateStats(baseAttack, level);
         this.specialAttack = calculateStats(baseSpecialAttack, level);
         this.defense = calculateStats(baseDefense, level);
@@ -66,6 +68,14 @@ public class Pokemon {
     
     public String getName() {
         return name;
+    }
+
+    public void setMaxHp(short maxHp) {
+        this.maxHp = maxHp;
+    }
+
+    public short getMaxHp() {
+        return maxHp;
     }
     
     public short getHp() {
