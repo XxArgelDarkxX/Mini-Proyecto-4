@@ -89,14 +89,14 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
                 },
                 new String [] {
                         "ID", "Pokemon", "Tipo", "Vida"
-                    } 
-            ) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
                 }
-            });
-            
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        });
+
         Table2.setFocusable(false);
         Table2.setRowSelectionAllowed(false);
         Table2.getTableHeader().setReorderingAllowed(false);
@@ -114,11 +114,11 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
                 new String [] {
                         "ID", "Pokemon", "Tipo", "Vida"
                 }
-            ) {
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
         });
 
         Table1.setFocusable(false);
@@ -146,7 +146,7 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
             }
         });
         getContentPane().add(battleButton);
-        battleButton.setBounds(320, 250, 84, 22);
+        battleButton.setBounds(320, 250, 104, 22);
 
         changeViewButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -187,7 +187,7 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
         infoLabel.setFont(new java.awt.Font("Roboto Black", 3, 12));
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoPanel.add(infoLabel, BorderLayout.CENTER);
-        
+
         getContentPane().add(infoPanel);
         infoPanel.setBounds(230, 280, 270, 20);
 
@@ -205,22 +205,24 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
 
     private void battleButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-            controller.processPokemonSelection();
+        selectedPokemon[0] = jTextField1.getText().trim(); // ID del primer pokemon
+        selectedPokemon[1] = jTextField2.getText().trim();
+
+        if(validatePokemonSelection(selectedPokemon[0], selectedPokemon[1])) {
+            nextView();
+        }
     }
 
     private void battleButtonMouseExited(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
         battleButton.setBackground(Color.white);
 
     }
 
     private void battleButtonMouseEntered(java.awt.event.MouseEvent evt) {
-        // TODO add your handling code here:
         battleButton.setBackground(new Color (109, 188, 245));
     }
 
     private void changeViewButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
         dispose();
         controller.changeView();
     }
@@ -250,13 +252,14 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
         MusicPlayer.stopMusic();
     }
 
+    String[] selectedPokemon = new String[2];
     @Override
     public void nextView() {
         dispose();
+        stopMusic();
         playMusic("Pokémon-Black-_-White-Elite-Four-Battle-Music-_HQ_.wav");
-        String[] selectedPokemon = new String[2];
-        selectedPokemon[0] = jTextField1.getText().trim(); // ID del primer pokemon
-        selectedPokemon[1] = jTextField2.getText().trim(); // ID del segundo pokemon
+
+         // ID del segundo pokemon
         BattleGUIView battleView = new BattleGUIView(trainers, selectedPokemon);
         battleView.setVisible(true);
     }
@@ -284,7 +287,7 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
     public void showPokemonList(Model.Pokemon[] pokemons, String trainerName) {
         // Este método no se utiliza en la implementación de la GUI
     }
-    
+
     @Override
     public void showSelectedPokemon(String trainerName, Model.Pokemon pokemon) {
         // Este método no se utiliza en la implementación de la GUI
@@ -359,4 +362,3 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
     }
 
 }
-

@@ -125,7 +125,6 @@ public class PokemonsSelectionConsoleView implements PokemonsSelectionView {
             String[] selectedPokemon = new String[2];
             selectedPokemon[0] = pokemon1Id;
             selectedPokemon[1] = pokemon2Id;
-            
             BattleGUIView battleView = new BattleGUIView(controller.getTrainers(), selectedPokemon);
             battleView.setVisible(true);
         }

@@ -182,7 +182,7 @@ public class Pokemon {
     
     // Este método calcula la efectividad de un movimiento de un tipo de Pokemon sobre otro tipo de Pokemon.
     // El metodo es privado porque solo va a ser usado por la clase Pokemon.
-    private double moveEffectiveness(Type attack, Type defender) {
+    double moveEffectiveness(Type attack, Type defender) {
         return (double) TYPE_EFFECTIVENESS[attack.ordinal()][defender.ordinal()];
     }
     
@@ -205,10 +205,21 @@ public class Pokemon {
         target.setHp((short) (target.getHp() - (((currentAttack/currentDefense) * move.getPower()) * effectiveness + 2))); // Se resta la vida del Pokemon objetivo.
     }
 
-    public void executeMove(Pokemon defender, byte move) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'executeMove'");
+    public int executeMove(Pokemon defender, byte moveIndex) {
+    Movement move = this.moves.get(moveIndex);
+    double effectiveness = moveEffectiveness(move.getType(), defender.getType());
+    
+    short attackStat = move.getTypeAttack() == Movement.TypeAttack.FISICO ? this.attack : this.specialAttack;
+    short defenseStat = move.getTypeAttack() == Movement.TypeAttack.FISICO ? defender.getDefense() : defender.getSpecialDefense();
+    
+    // Fórmula simplificada de daño Pokémon
+    int damage = (int) ((((2 * this.level / 5 + 2) * move.getPower() * attackStat / defenseStat) / 50 + 2) * effectiveness);
+    
+    defender.setHp((short) Math.max(0, defender.getHp() - damage));
+    return damage;
     }
 
-
+    public String getMoveName(byte moveIndex) {
+        return moves.get(moveIndex).getName();
+    }
 }
