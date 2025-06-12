@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.LayoutStyle;
@@ -39,8 +41,13 @@ import javax.swing.WindowConstants;
 
 import Controller.BattleController;
 import Model.Trainer;
+import Model.GameStateManager;
+import Model.BattleHistory;
 import Model.Pokemon;
+import Model.PokemonBattle;
+
 import javax.swing.JSeparator;
+
 
 /**
  *
@@ -50,13 +57,17 @@ public class BattleGUIView extends JFrame {
 
     public Trainer[] trainers;
     public String[] pokemonsBattle;
+
     public BattleController controller;
+    public GameStateManager gameStateManager;
+    private PokemonBattle pokemonBattle;
+
     public byte moveTrainer1 = -1;
     public byte moveTrainer2 = -1;
     public byte x = 0;
     public byte y = 0;
 
-
+    private BattleHistory battleHistory;
     class PokemonHealthBar extends JPanel {
         private float currentHP;
         private final float maxHP;
@@ -64,47 +75,52 @@ public class BattleGUIView extends JFrame {
         private JLabel hpLabel;
         private Timer animationTimer;
         private static final int ANIMATION_DELAY = 50;
-    
-        public PokemonHealthBar(float maxHP, JLabel hpLabel) {
+        private boolean isInitializing = true;
+
+        public PokemonHealthBar(float maxHP, float _currentHP, JLabel hpLabel) {
             this.maxHP = maxHP;
-            this.currentHP = maxHP;
-            this.targetHP = maxHP;
+            this.currentHP = _currentHP;
+            this.targetHP = _currentHP;
             this.hpLabel = hpLabel;
             setPreferredSize(new Dimension(150, 8));
             setOpaque(false);
-    
-            // Configurar el timer para la animación
+
             animationTimer = new Timer(ANIMATION_DELAY, e -> {
-                if (currentHP > targetHP) {
-                    currentHP = Math.max(targetHP, currentHP - 1);
+                if (currentHP != targetHP) {
+                    if (currentHP > targetHP) {
+                        currentHP = Math.max(targetHP, currentHP - 1);
+                    } else {
+                        currentHP = Math.min(targetHP, currentHP + 1);
+                    }
                     updateHPLabel();
                     repaint();
+                    
                     if (currentHP == targetHP) {
                         animationTimer.stop();
                     }
                 }
             });
         }
-    
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    
+
             int width = getWidth();
             int height = getHeight();
-            int arc = height; // Para hacer los bordes completamente redondeados
-    
+            int arc = height;
+
             // Fondo negro
             g2d.setColor(new Color(48, 48, 48));
             g2d.fillRoundRect(0, 0, width, height, arc, arc);
-    
-            // Barra de vida
+
+            // Calcular porcentaje de vida y ancho de la barra
             float hpPercentage = currentHP / maxHP;
             int barWidth = (int) (width * hpPercentage);
-    
-            // Color basado en el porcentaje de vida
+
+            // Determinar color según porcentaje de vida
             Color healthColor;
             if (hpPercentage > 0.5f) {
                 healthColor = new Color(0, 192, 0); // Verde
@@ -113,26 +129,39 @@ public class BattleGUIView extends JFrame {
             } else {
                 healthColor = new Color(192, 0, 0); // Rojo
             }
-    
+
+            // Dibujar barra de vida
             g2d.setColor(healthColor);
-            g2d.fillRoundRect(0, 0, barWidth, height, arc, arc);
-    
-            // Borde para mejor visibilidad
+            if (barWidth > 0) {
+                g2d.fillRoundRect(0, 0, barWidth, height, arc, arc);
+            }
+
+            // Borde
             g2d.setColor(new Color(32, 32, 32));
             g2d.setStroke(new BasicStroke(1));
             g2d.drawRoundRect(0, 0, width - 1, height - 1, arc, arc);
-    
+
             g2d.dispose();
         }
-    
+
         private void updateHPLabel() {
-            hpLabel.setText(String.valueOf((int)currentHP));
+            if (hpLabel != null) {
+                hpLabel.setText(String.valueOf((int)currentHP));
+            }
         }
-    
+
         public void setHP(float newHP) {
-            this.targetHP = Math.max(0, Math.min(newHP, maxHP));
-            if (!animationTimer.isRunning()) {
-                animationTimer.start();
+            if (isInitializing) {
+                this.currentHP = newHP;
+                this.targetHP = newHP;
+                updateHPLabel();
+                repaint();
+                isInitializing = false;
+            } else {
+                this.targetHP = Math.max(0, Math.min(newHP, maxHP));
+                if (!animationTimer.isRunning()) {
+                    animationTimer.start();
+                }
             }
         }
     }
@@ -141,18 +170,27 @@ public class BattleGUIView extends JFrame {
      */
     BackgroundPanel background = new BackgroundPanel();
     public BattleGUIView() {
-
         initComponents();
         loadPokemonImage();
         loadPokemonImage2();
     }
+
     public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) {
         this.pokemonsBattle = pokemonsBattle;
         this.trainers = trainers;
+        this.gameStateManager = new GameStateManager();
+        Pokemon[] initialPokemons = new Pokemon[2];
+        initialPokemons[0] = trainers[0].getPokemonTeam().get(0);
+        initialPokemons[1] = trainers[1].getPokemonTeam().get(0);
+        this.pokemonBattle = new PokemonBattle(trainers, initialPokemons);
+        this.battleHistory = new BattleHistory(trainers[0].getName(), trainers[1].getName());
+        battleHistory.logBattleStart(); // Registrar inicio de batalla
         initComponents();
         initializePokemonSelection();
+        initializeSaveButton();
         loadPokemonImage();
         loadPokemonImage2();
+        
     }
 
 
@@ -190,11 +228,13 @@ public class BattleGUIView extends JFrame {
         attack2_3 = new JToggleButton();
         attack2_4 = new JToggleButton();
         healthBar1 = new PokemonHealthBar(
-            trainers[0].getPokemonTeam().get(x).getHp(), 
+            trainers[0].getPokemonTeam().get(x).getMaxHp(),
+            trainers[0].getPokemonTeam().get(x).getHp(),
             hpLabel1
         );
         healthBar2 = new PokemonHealthBar(
-            trainers[1].getPokemonTeam().get(y).getHp(), 
+            trainers[1].getPokemonTeam().get(y).getMaxHp(),
+            trainers[1].getPokemonTeam().get(y).getHp(),
             hpLabel2
         );
 
@@ -363,7 +403,7 @@ public class BattleGUIView extends JFrame {
         slashLabel1.setFont(new Font("Roboto Black", 3, 12)); // NOI18N
 
         maxHpLabel1.setFont(new Font("Roboto Black", 3, 12)); // NOI18N
-        maxHpLabel1.setText(String.valueOf(trainers[0].getPokemonTeam().get(x).getHp()));
+        maxHpLabel1.setText(String.valueOf(trainers[0].getPokemonTeam().get(x).getMaxHp()));
         
         pokemon1.setFont(new Font("Roboto Black", 3, 12)); // NOI18N
         pokemon1.setText(trainers[0].getPokemonTeam().get(x).getName());
@@ -383,7 +423,7 @@ public class BattleGUIView extends JFrame {
         slashLabel2.setFont(new Font("Roboto Black", 3, 12)); // NOI18N
 
         maxHpLabel2.setFont(new Font("Roboto Black", 3, 12)); // NOI18N
-        maxHpLabel2.setText(String.valueOf(trainers[1].getPokemonTeam().get(y).getHp()));
+        maxHpLabel2.setText(String.valueOf(trainers[1].getPokemonTeam().get(y).getMaxHp()));
         
         attack2_1.setBackground(new Color(255, 255, 255));
         attack2_1.setFont(new Font("Roboto", 2, 15)); // NOI18N
@@ -594,6 +634,15 @@ public class BattleGUIView extends JFrame {
         victoryPanel.setVisible(false);
     }
 
+    private void initializeSaveButton() {
+        saveGameButton = new JButton("Guardar Partida");
+        saveGameButton.setBackground(new Color(102, 178, 255));
+        saveGameButton.setForeground(Color.WHITE);
+        saveGameButton.setBounds(10, 10, 120, 30);
+        saveGameButton.addActionListener(e -> saveGame());
+        jPanel2.add(saveGameButton);
+    }
+
     private void createStylizedBorder(int x, int y, int width, int height, boolean isHorizontal, boolean isCentralSeparator, boolean isBottom, boolean isRight) {
         // Capa base (más oscura)
         JSeparator baseBorder = new JSeparator(isHorizontal ? JSeparator.HORIZONTAL : JSeparator.VERTICAL);
@@ -654,6 +703,7 @@ public class BattleGUIView extends JFrame {
         new SwingWorker<ImageIcon, Void>() {
             @Override
             protected ImageIcon doInBackground() throws Exception {
+                @SuppressWarnings("deprecation")
                 URL url = new URL(pokemon.getIcon());
                 Image image = ImageIO.read(url);
                 return new ImageIcon(image);
@@ -675,7 +725,10 @@ public class BattleGUIView extends JFrame {
     // Método para seleccionar un nuevo Pokémon
     private void selectPokemon(int trainer, int pokemonIndex) {
         if (trainer == 0) {
+            String oldPokemon = trainers[0].getPokemonTeam().get(x).getName();
             x = (byte)pokemonIndex;
+            String newPokemon = trainers[0].getPokemonTeam().get(x).getName();
+            battleHistory.logPokemonChange(trainer, oldPokemon, newPokemon);
             pokemonSelectionPanel1.setVisible(false);
             if (trainers[0].getPokemonTeam().get(x).getHp() > 0) {
                 attack1_1.setVisible(true);
@@ -686,6 +739,7 @@ public class BattleGUIView extends JFrame {
                 updatePokemonInfo();
                 hpPanel1.remove(healthBar1);
                 healthBar1 = new PokemonHealthBar(
+                    trainers[0].getPokemonTeam().get(x).getMaxHp(),
                     trainers[0].getPokemonTeam().get(x).getHp(),
                     hpLabel1
                 );
@@ -697,7 +751,10 @@ public class BattleGUIView extends JFrame {
                 enableTrainer1Attacks();
             }
         } else {
+            String oldPokemon = trainers[1].getPokemonTeam().get(y).getName();
             y = (byte)pokemonIndex;
+            String newPokemon = trainers[1].getPokemonTeam().get(y).getName();
+            battleHistory.logPokemonChange(trainer, oldPokemon, newPokemon);
             pokemonSelectionPanel2.setVisible(false);
             if (trainers[1].getPokemonTeam().get(y).getHp() > 0) {
                 attack2_1.setVisible(true);
@@ -708,6 +765,7 @@ public class BattleGUIView extends JFrame {
                 updatePokemonInfo();
                 hpPanel2.remove(healthBar2);
                 healthBar2 = new PokemonHealthBar(
+                    trainers[1].getPokemonTeam().get(y).getMaxHp(),
                     trainers[1].getPokemonTeam().get(y).getHp(),
                     hpLabel2
                 );
@@ -727,8 +785,8 @@ public class BattleGUIView extends JFrame {
         pokemon2.setText(trainers[1].getPokemonTeam().get(y).getName());
         hpLabel1.setText(String.valueOf(trainers[0].getPokemonTeam().get(x).getHp()));
         hpLabel2.setText(String.valueOf(trainers[1].getPokemonTeam().get(y).getHp()));
-        maxHpLabel1.setText(String.valueOf(trainers[0].getPokemonTeam().get(x).getHp()));
-        maxHpLabel2.setText(String.valueOf(trainers[1].getPokemonTeam().get(y).getHp()));
+        maxHpLabel1.setText(String.valueOf(trainers[0].getPokemonTeam().get(x).getMaxHp()));
+        maxHpLabel2.setText(String.valueOf(trainers[1].getPokemonTeam().get(y).getMaxHp()));
         
         // Actualizar textos de los botones de ataque
         attack1_1.setText(trainers[0].getPokemonTeam().get(x).getMoves().get(0).getName());
@@ -1105,21 +1163,33 @@ public class BattleGUIView extends JFrame {
         }.execute();
     }
 
-    public void attackBySpeed() {
+        public void attackBySpeed() {
         Pokemon _pokemon1 = trainers[0].getPokemonTeam().get(x);
         Pokemon _pokemon2 = trainers[1].getPokemonTeam().get(y);
-
-        // Determina quién ataca primero basado en la velocidad
+        
+        // Registrar qué Pokémon están en batalla
+        battleHistory.logPokemonSent(0, _pokemon1.getName());
+        battleHistory.logPokemonSent(1, _pokemon2.getName());
+        
+        int damage1 = _pokemon1.getMoves().get(moveTrainer1).getPower();
+        int damage2 = _pokemon2.getMoves().get(moveTrainer2).getPower();
+        
         if (_pokemon1.getSpeed() >= _pokemon2.getSpeed()) {
             // Pokemon 1 ataca primero
+            battleHistory.logMoveSelection(0, _pokemon1.getName(), 
+                _pokemon1.getMoves().get(moveTrainer1).getName());
             _pokemon1.movement(_pokemon2, moveTrainer1);
-            
-            // Actualiza la hp del Pokemon 2 y verifica si murió
+            battleHistory.logAttack(_pokemon1.getName(), 
+                _pokemon1.getMoves().get(moveTrainer1).getName(), 
+                _pokemon2.getName(), damage1, _pokemon2.getHp());
+            battleHistory.saveBattleHistory();
+                
             if (_pokemon2.getHp() <= 0) {
                 _pokemon2.setHp((short)0);
                 healthBar2.setHP(0);
                 hpLabel2.setText("0");
                 ImageUrl2.setIcon(null);
+                disableTrainer1Attacks();
                 disableTrainer2Attacks();
                 attack2_1.setVisible(false);
                 attack2_2.setVisible(false);
@@ -1127,39 +1197,56 @@ public class BattleGUIView extends JFrame {
                 attack2_4.setVisible(false);
                 pokemonSelectionPanel2.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                battleHistory.logPokemonFainted(_pokemon2.getName());
                 checkBattleState();
                 enableTrainer1Attacks();
+                battleHistory.saveBattleHistory();
             } else {
                 healthBar2.setHP(_pokemon2.getHp());
                 hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
-                _pokemon2.movement(_pokemon1, moveTrainer2);
                 
+                // Pokemon 2 contraataca
+                battleHistory.logMoveSelection(1, _pokemon2.getName(), 
+                    _pokemon2.getMoves().get(moveTrainer2).getName());
+                _pokemon2.movement(_pokemon1, moveTrainer2);
+                battleHistory.logAttack(_pokemon2.getName(), 
+                    _pokemon2.getMoves().get(moveTrainer2).getName(), 
+                    _pokemon1.getName(), damage2, _pokemon1.getHp());
+                battleHistory.saveBattleHistory();
+                    
                 if (_pokemon1.getHp() <= 0) {
                     _pokemon1.setHp((short)0);
                     healthBar1.setHP(0);
                     hpLabel1.setText("0");
                     imageUrl.setIcon(null);
                     disableTrainer1Attacks();
+                    disableTrainer2Attacks();
                     attack1_1.setVisible(false);
                     attack1_2.setVisible(false);
                     attack1_3.setVisible(false);
                     attack1_4.setVisible(false);
                     pokemonSelectionPanel1.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
+                    battleHistory.logPokemonFainted(_pokemon1.getName());
                     checkBattleState();
                     enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 } else {
                     healthBar1.setHP(_pokemon1.getHp());
                     hpLabel1.setText(String.valueOf(_pokemon1.getHp()));
                     enableTrainer1Attacks();
                     enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 }
             }
         } else {
             // Pokemon 2 ataca primero
+            battleHistory.logMoveSelection(1, _pokemon2.getName(), 
+                _pokemon2.getMoves().get(moveTrainer2).getName());
             _pokemon2.movement(_pokemon1, moveTrainer2);
-            
-            // Actualiza la hp del Pokemon 1 y verifica si murió
+            battleHistory.logAttack(_pokemon2.getName(), 
+                _pokemon2.getMoves().get(moveTrainer2).getName(), 
+                _pokemon1.getName(), damage2, _pokemon1.getHp());
             if (_pokemon1.getHp() <= 0) {
                 _pokemon1.setHp((short)0);
                 healthBar1.setHP(0);
@@ -1172,13 +1259,23 @@ public class BattleGUIView extends JFrame {
                 attack1_4.setVisible(false);
                 pokemonSelectionPanel1.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
+                battleHistory.logPokemonFainted(_pokemon1.getName());
                 checkBattleState();
                 enableTrainer2Attacks();
+                battleHistory.saveBattleHistory();
             } else {
                 healthBar1.setHP(_pokemon1.getHp());
                 hpLabel1.setText(String.valueOf(_pokemon1.getHp()));
+                
+                // Pokemon 1 contraataca
+                battleHistory.logMoveSelection(0, _pokemon1.getName(), 
+                    _pokemon1.getMoves().get(moveTrainer1).getName());
                 _pokemon1.movement(_pokemon2, moveTrainer1);
-
+                battleHistory.logAttack(_pokemon1.getName(), 
+                    _pokemon1.getMoves().get(moveTrainer1).getName(), 
+                    _pokemon2.getName(), damage1, _pokemon2.getHp());
+                battleHistory.saveBattleHistory();
+                    
                 if (_pokemon2.getHp() <= 0) {
                     _pokemon2.setHp((short)0);
                     healthBar2.setHP(0);
@@ -1191,24 +1288,107 @@ public class BattleGUIView extends JFrame {
                     attack2_4.setVisible(false);
                     pokemonSelectionPanel2.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                    battleHistory.logPokemonFainted(_pokemon2.getName());
                     checkBattleState();
                     enableTrainer1Attacks();
+                    battleHistory.saveBattleHistory();
                 } else {
                     healthBar2.setHP(_pokemon2.getHp());
                     hpLabel2.setText(String.valueOf(_pokemon2.getHp()));
-                    enableTrainer2Attacks();
                     enableTrainer1Attacks();
+                    enableTrainer2Attacks();
+                    battleHistory.saveBattleHistory();
                 }
-            }
+            }       
+        }
+        
+        // Verificar si la batalla ha terminado
+        boolean trainer1Dead = trainers[0].getPokemonTeam().stream().noneMatch(p -> p.getHp() > 0);
+        boolean trainer2Dead = trainers[1].getPokemonTeam().stream().noneMatch(p -> p.getHp() > 0);
+        
+        if (trainer1Dead || trainer2Dead) {
+            String winner = trainer1Dead ? trainers[1].getName() : trainers[0].getName();
+            battleHistory.logBattleEnd(winner);
+            battleHistory.saveBattleHistory();
+            
         }
         
         // Reinicia los movimientos seleccionados
         moveTrainer1 = -1;
         moveTrainer2 = -1;
-
         deselectAllButtons();
     }
+  
+    private void saveGame() {
+        if (pokemonBattle == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error: No hay batalla en curso para guardar",
+                "Error",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        String saveName = JOptionPane.showInputDialog(
+            this,
+            "Introduce un nombre para la partida guardada:",
+            "Guardar Partida",
+            JOptionPane.PLAIN_MESSAGE
+        );
+        
+        if (saveName != null && !saveName.trim().isEmpty()) {
+            try {
+                gameStateManager.saveGame(saveName, pokemonBattle);
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Partida guardada exitosamente",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Error al guardar la partida: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
+    public void setPokemonBattle(PokemonBattle pokemonBattle) {
+        this.pokemonBattle = pokemonBattle;
+        
+        // Actualizar índices de Pokemon actuales
+        x = (byte) pokemonBattle.getCurrentPokemonIndex(0);
+        y = (byte) pokemonBattle.getCurrentPokemonIndex(1);
+        
+        // Actualizar movimientos seleccionados
+        moveTrainer1 = -1;
+        moveTrainer2 = -1;
+        
+        // Actualizar la interfaz
+        updatePokemonInfo();
+        updateHealthBars();
+        deselectAllButtons();
+    }
+    /**
+     * Actualiza las barras de vida de los Pokemon
+     */
+    private void updateHealthBars() {
+        if (healthBar1 != null && healthBar2 != null) {
+            Pokemon pokemon1 = pokemonBattle.getCurrentPokemon(0);
+            Pokemon pokemon2 = pokemonBattle.getCurrentPokemon(1);
+            healthBar1.setHP(pokemon1.getHp());
+            healthBar2.setHP(pokemon2.getHp());
+        }
+    }
+    /**
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
+        EventQueue.invokeLater(() -> new BattleGUIView().setVisible(true));
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -1280,6 +1460,7 @@ public class BattleGUIView extends JFrame {
     private JLabel slashLabel2;
     private PokemonHealthBar healthBar1;
     private PokemonHealthBar healthBar2;
+    private JButton saveGameButton;
     // End of variables declaration
 
     class BackgroundPanel extends JPanel{

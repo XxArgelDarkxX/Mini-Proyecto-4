@@ -7,7 +7,7 @@ import View.Interfaces.MainView;
 public class MainController {
     private MainView view;
     private boolean isGui;
-
+    
     public MainController(MainView view, boolean isGui) {
         this.view = view;
         this.isGui = isGui;
@@ -19,6 +19,9 @@ public class MainController {
         view.showMenu();
     }
 
+    // Método para iniciar el juego
+    // Este método se llamará cuando el usuario quiera iniciar el juego
+    // En este caso, simplemente cambiaremos a la vista de Entrenador
     public void nextView() {
         // Aquí irá la lógica para iniciar el juego
         if (!isGui) {
@@ -28,6 +31,9 @@ public class MainController {
             view.nextView();
         }
     }
+
+    // Método para cambiar entre la vista de consola y la vista gráfica
+    // Este método se llamará cuando el usuario quiera cambiar la vista
 
     public void changeView() {
         if (isGui) {
@@ -40,9 +46,14 @@ public class MainController {
         view.showMenu();
     }
 
+    // Método para finalizar el juego
+    // Este método se llamará cuando el usuario quiera salir del juego
     public void finish() {
         view.stopMusic();
         view.showMessage("¡Gracias por jugar!");
         System.exit(0);
     }
+
+    
+
 }
