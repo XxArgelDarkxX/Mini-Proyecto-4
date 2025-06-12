@@ -39,6 +39,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+import Controller.BattleController;
 import Model.Trainer;
 import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
 import Model.Exceptions.pokemonBattle.quantityCheckException;
@@ -58,8 +59,11 @@ public class BattleGUIView extends JFrame {
 
     public Trainer[] trainers;
     public String[] pokemonsBattle;
+
+    public BattleController controller;
     public GameStateManager gameStateManager;
     private PokemonBattle pokemonBattle;
+
     public byte moveTrainer1 = -1;
     public byte moveTrainer2 = -1;
     public byte x = 0;
@@ -1384,7 +1388,6 @@ public class BattleGUIView extends JFrame {
         updateHealthBars();
         deselectAllButtons();
     }
-
     /**
      * Actualiza las barras de vida de los Pokemon
      */
@@ -1430,6 +1433,10 @@ public class BattleGUIView extends JFrame {
                 new BattleGUIView().setVisible(true);
             }
         });
+    }
+    // En BattleGUIView.java
+    public void setController(BattleController controller) {
+        this.controller = controller;
     }
 
     // Variables declaration - do not modify
