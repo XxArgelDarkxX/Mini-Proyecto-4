@@ -5,5 +5,6 @@ public class App {
         MainGUIView main = new MainGUIView();
         MainController controller = new MainController(main, true);
         controller.initialize();
+
     }
 }
