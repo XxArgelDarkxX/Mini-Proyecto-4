@@ -94,4 +94,9 @@ public class TrainerConsoleView implements TrainerView {
         PokemonsSelectionController pokemonSelectController = new PokemonsSelectionController(pokemonSelectView, controller.getTrainers(), false);
         pokemonSelectController.initialize();
     }
+    
+    @Override
+    public void showError(String message) {
+        System.out.println("ERROR: " + message);
+    }
 }

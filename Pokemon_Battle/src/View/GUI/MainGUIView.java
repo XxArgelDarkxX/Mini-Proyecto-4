@@ -5,7 +5,6 @@ import Controller.TrainerController;
 import Model.Exceptions.pokemonBattle.indexErrorException;
 import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
 import Model.Exceptions.pokemonBattle.quantityCheckException;
-import Model.GameStateManager;
 import Model.PokemonBattle;
 import View.Interfaces.MainView;
 import View.Utils.MusicPlayer;
@@ -31,14 +30,12 @@ import javax.swing.JPanel;
  * @author crisc
  */
 public class MainGUIView extends JFrame implements MainView {
-    private GameStateManager gameStateManager;
     private MainController controller;
     /**
      * Creates new form Inicio
      */
     public MainGUIView() {
         initComponents();
-        gameStateManager = new GameStateManager();
 // this.setUndecorated(true); // Opcional: elimina bordes
     }
 
@@ -125,7 +122,13 @@ public class MainGUIView extends JFrame implements MainView {
         gridBagConstraints.insets = new java.awt.Insets(60, 400, 0, 0);
         jPanel1.add(loadGameButton, gridBagConstraints);
 
-        background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg"))); // NOI18N
+        try {
+            background.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg"))); // NOI18N
+        } catch (NullPointerException e) {
+            // Imagen no encontrada, continuar sin ella
+            System.out.println("Advertencia: No se pudo cargar la imagen de fondo");
+        }
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -201,55 +204,12 @@ public class MainGUIView extends JFrame implements MainView {
     }
 
     private void loadGame() throws quantityCheckException, pokemonNotFoundException, indexErrorException {
-        String[] savedGames = gameStateManager.listSavedGames();
-        
-        if (savedGames.length == 0) {
-            JOptionPane.showMessageDialog(
-                this,
-                "No hay partidas guardadas",
-                "Cargar Partida",
-                JOptionPane.INFORMATION_MESSAGE
-            );
-            return;
-        }
-        
-        String selectedGame = (String) JOptionPane.showInputDialog(
+        JOptionPane.showMessageDialog(
             this,
-            "Selecciona una partida guardada:",
+            "La carga de partidas se realiza automáticamente\ndesde el servidor mediante la API.",
             "Cargar Partida",
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            savedGames,
-            savedGames[0]
+            JOptionPane.INFORMATION_MESSAGE
         );
-        
-        if (selectedGame != null) {
-            try {
-                PokemonBattle loadedBattle = gameStateManager.loadGame(selectedGame);
-                
-                // Cerrar la ventana actual
-                this.dispose();
-                
-                // Crear y mostrar la vista de batalla con la partida cargada
-                BattleGUIView battleView = new BattleGUIView(
-                    loadedBattle.getTrainers(),
-                    new String[]{
-                        loadedBattle.getCurrentPokemon(0).getPokedexId(),
-                        loadedBattle.getCurrentPokemon(1).getPokedexId()
-                    }
-                );
-                battleView.setPokemonBattle(loadedBattle);
-                battleView.setVisible(true);
-                
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Error al cargar la partida: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
     }
 
 
@@ -287,9 +247,16 @@ public class MainGUIView extends JFrame implements MainView {
         private Image imagen;
         @Override
         public void paint(Graphics g) {
-            imagen = new ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg")).getImage();
-            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
-
+            try {
+                imagen = new ImageIcon(getClass().getResource("/View/Utils/inicio.jpeg")).getImage();
+                if (imagen != null) {
+                    g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+                }
+            } catch (NullPointerException e) {
+                // Imagen no encontrada, pintar con fondo gris
+                g.setColor(java.awt.Color.GRAY);
+                g.fillRect(0, 0, getWidth(), getHeight());
+            }
 
             setOpaque(false);
             super.paint(g);

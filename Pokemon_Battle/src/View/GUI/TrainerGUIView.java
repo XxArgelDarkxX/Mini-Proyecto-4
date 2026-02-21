@@ -197,7 +197,12 @@ public class TrainerGUIView extends JFrame implements TrainerView {
         gridBagConstraints.insets = new java.awt.Insets(20, 21, 0, 0);
         getContentPane().add(trainerTextField1, gridBagConstraints);
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/fondoEntrenador.jpg"))); // NOI18N
+        try {
+            jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/Utils/fondoEntrenador.jpg"))); // NOI18N
+        } catch (NullPointerException e) {
+            System.out.println("Advertencia: No se pudo cargar la imagen de fondo del entrenador");
+        }
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -322,6 +327,11 @@ public class TrainerGUIView extends JFrame implements TrainerView {
         dispose();
         PokemonsSelectionController pokemonSelectController = new PokemonsSelectionController(new PokemonsSelectionGUIView(controller.getTrainers()), controller.getTrainers(), true);
         pokemonSelectController.initialize();   
+    }
+
+    @Override
+    public void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     /**

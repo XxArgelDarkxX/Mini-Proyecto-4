@@ -41,9 +41,9 @@ import javax.swing.WindowConstants;
 
 import Controller.BattleController;
 import Model.Trainer;
+import Model.api.ApiClient;
 import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
 import Model.Exceptions.pokemonBattle.quantityCheckException;
-import Model.GameStateManager;
 import Model.BattleHistory;
 import Model.Pokemon;
 import Model.PokemonBattle;
@@ -61,7 +61,6 @@ public class BattleGUIView extends JFrame {
     public String[] pokemonsBattle;
 
     public BattleController controller;
-    public GameStateManager gameStateManager;
     private PokemonBattle pokemonBattle;
 
     public byte moveTrainer1 = -1;
@@ -180,7 +179,6 @@ public class BattleGUIView extends JFrame {
     public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) throws quantityCheckException, pokemonNotFoundException {
         this.pokemonsBattle = pokemonsBattle;
         this.trainers = trainers;
-        this.gameStateManager = new GameStateManager();
         Pokemon[] initialPokemons = new Pokemon[2];
         initialPokemons[0] = trainers[0].getPokemonTeam().get(0);
         initialPokemons[1] = trainers[1].getPokemonTeam().get(0);
@@ -603,31 +601,35 @@ public class BattleGUIView extends JFrame {
         jPanel2.add(victoryPanel);
 
         // Crear y configurar botones para el entrenador 1
-        for(int i = 0; i < 3; i++) {
-            pokemonButtons1[i] = new JButton();
-            pokemonButtons1[i].setPreferredSize(new Dimension(120, 50));
-            final int index = i;
-            
-            loadPokemonIcon(pokemonButtons1[i], trainers[0].getPokemonTeam().get(i));
-            pokemonButtons1[i].setText("<html>" + trainers[0].getPokemonTeam().get(i).getName() + 
-                                    "<br>HP: " + trainers[0].getPokemonTeam().get(i).getHp() + "</html>");
-            
-            pokemonButtons1[i].addActionListener(e -> selectPokemon(0, index));
-            pokemonSelectionPanel1.add(pokemonButtons1[i]);
+        if (trainers[0] != null && trainers[0].getPokemonTeam() != null && trainers[0].getPokemonTeam().size() >= 3) {
+            for(int i = 0; i < 3; i++) {
+                pokemonButtons1[i] = new JButton();
+                pokemonButtons1[i].setPreferredSize(new Dimension(120, 50));
+                final int index = i;
+                
+                loadPokemonIcon(pokemonButtons1[i], trainers[0].getPokemonTeam().get(i));
+                pokemonButtons1[i].setText("<html>" + trainers[0].getPokemonTeam().get(i).getName() + 
+                                        "<br>HP: " + trainers[0].getPokemonTeam().get(i).getHp() + "</html>");
+                
+                pokemonButtons1[i].addActionListener(e -> selectPokemon(0, index));
+                pokemonSelectionPanel1.add(pokemonButtons1[i]);
+            }
         }
 
         // Crear y configurar botones para el entrenador 2
-        for(int i = 0; i < 3; i++) {
-            pokemonButtons2[i] = new JButton();
-            pokemonButtons2[i].setPreferredSize(new Dimension(120, 50));
-            final int index = i;
-            
-            loadPokemonIcon(pokemonButtons2[i], trainers[1].getPokemonTeam().get(i));
-            pokemonButtons2[i].setText("<html>" + trainers[1].getPokemonTeam().get(i).getName() + 
-                                    "<br>HP: " + trainers[1].getPokemonTeam().get(i).getHp() + "</html>");
-            
-            pokemonButtons2[i].addActionListener(e -> selectPokemon(1, index));
-            pokemonSelectionPanel2.add(pokemonButtons2[i]);
+        if (trainers[1] != null && trainers[1].getPokemonTeam() != null && trainers[1].getPokemonTeam().size() >= 3) {
+            for(int i = 0; i < 3; i++) {
+                pokemonButtons2[i] = new JButton();
+                pokemonButtons2[i].setPreferredSize(new Dimension(120, 50));
+                final int index = i;
+                
+                loadPokemonIcon(pokemonButtons2[i], trainers[1].getPokemonTeam().get(i));
+                pokemonButtons2[i].setText("<html>" + trainers[1].getPokemonTeam().get(i).getName() + 
+                                        "<br>HP: " + trainers[1].getPokemonTeam().get(i).getHp() + "</html>");
+                
+                pokemonButtons2[i].addActionListener(e -> selectPokemon(1, index));
+                pokemonSelectionPanel2.add(pokemonButtons2[i]);
+            }
         }
 
         // Ocultar paneles inicialmente
@@ -862,8 +864,53 @@ public class BattleGUIView extends JFrame {
             hideEverything();
             victoryPanel.setVisible(true);
             victoryPanel.setBounds(0, 410, jPanel2.getWidth(), jPanel2.getHeight());
-            victoryLabel.setText("<html>" + (!trainer1HasAlivePokemon ? trainers[1].getName() : trainers[0].getName()) 
+            
+            // Determinar ganador
+            int winnerIndex = trainer1HasAlivePokemon ? 0 : 1;
+            int loserIndex = trainer1HasAlivePokemon ? 1 : 0;
+            
+            victoryLabel.setText("<html>" + trainers[winnerIndex].getName() 
                             + " ha ganado la batalla. <br><center>¡Felicidades!</center></html>");
+            
+            // Registrar resultado en la API
+            try {
+                ApiClient apiClient = new ApiClient();
+                
+                // Registrar victoria del ganador
+                if (trainers[winnerIndex].getSuid() > 0) {
+                    apiClient.recordBattleWin(trainers[winnerIndex].getSuid());
+                }
+                
+                // Registrar derrota del perdedor
+                if (trainers[loserIndex].getSuid() > 0) {
+                    apiClient.recordBattleLoss(trainers[loserIndex].getSuid());
+                }
+                
+                // Actualizar experiencia de todos los Pokémon en la API
+                for (int i = 0; i < 3; i++) {
+                    Pokemon pokemon1 = trainers[0].getPokemonTeam().get(i);
+                    Pokemon pokemon2 = trainers[1].getPokemonTeam().get(i);
+                    
+                    if (trainers[0].getSuid() > 0 && pokemon1 != null) {
+                        try {
+                            apiClient.updatePokemonExperience(trainers[0].getSuid(), i, pokemon1.getExperience());
+                        } catch (IOException | InterruptedException e) {
+                            System.err.println("Error al actualizar exp del Pokémon " + i + " del entrenador 1: " + e.getMessage());
+                        }
+                    }
+                    
+                    if (trainers[1].getSuid() > 0 && pokemon2 != null) {
+                        try {
+                            apiClient.updatePokemonExperience(trainers[1].getSuid(), i, pokemon2.getExperience());
+                        } catch (IOException | InterruptedException e) {
+                            System.err.println("Error al actualizar exp del Pokémon " + i + " del entrenador 2: " + e.getMessage());
+                        }
+                    }
+                }
+                
+            } catch (IOException | InterruptedException e) {
+                System.err.println("Error al registrar resultado de batalla en la API: " + e.getMessage());
+            }
         }
         
         // Actualizar botones de selección de Pokémon
@@ -1211,6 +1258,8 @@ public class BattleGUIView extends JFrame {
                 pokemonSelectionPanel2.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
                 battleHistory.logPokemonFainted(_pokemon2.getName());
+                // Aumentar experiencia del Pokémon ganador
+                _pokemon1.addExperience(50);
                 checkBattleState();
                 enableTrainer1Attacks();
                 battleHistory.saveBattleHistory();
@@ -1241,6 +1290,8 @@ public class BattleGUIView extends JFrame {
                     pokemonSelectionPanel1.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
                     battleHistory.logPokemonFainted(_pokemon1.getName());
+                    // Aumentar experiencia del Pokémon ganador
+                    _pokemon2.addExperience(50);
                     checkBattleState();
                     enableTrainer2Attacks();
                     battleHistory.saveBattleHistory();
@@ -1273,6 +1324,8 @@ public class BattleGUIView extends JFrame {
                 pokemonSelectionPanel1.setVisible(true);
                 jPanel2.setComponentZOrder(pokemonSelectionPanel1, 0);
                 battleHistory.logPokemonFainted(_pokemon1.getName());
+                // Aumentar experiencia del Pokémon ganador
+                _pokemon2.addExperience(50);
                 checkBattleState();
                 enableTrainer2Attacks();
                 battleHistory.saveBattleHistory();
@@ -1302,6 +1355,8 @@ public class BattleGUIView extends JFrame {
                     pokemonSelectionPanel2.setVisible(true);
                     jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
                     battleHistory.logPokemonFainted(_pokemon2.getName());
+                    // Aumentar experiencia del Pokémon ganador
+                    _pokemon1.addExperience(50);
                     checkBattleState();
                     enableTrainer1Attacks();
                     battleHistory.saveBattleHistory();
@@ -1333,41 +1388,12 @@ public class BattleGUIView extends JFrame {
     }
   
     private void saveGame() {
-        if (pokemonBattle == null) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Error: No hay batalla en curso para guardar",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-
-        String saveName = JOptionPane.showInputDialog(
+        JOptionPane.showMessageDialog(
             this,
-            "Introduce un nombre para la partida guardada:",
-            "Guardar Partida",
-            JOptionPane.PLAIN_MESSAGE
+            "El guardado de partidas ahora se realiza automáticamente\nen el servidor mediante la API.",
+            "Guardado Automático",
+            JOptionPane.INFORMATION_MESSAGE
         );
-        
-        if (saveName != null && !saveName.trim().isEmpty()) {
-            try {
-                gameStateManager.saveGame(saveName, pokemonBattle);
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Partida guardada exitosamente",
-                    "Éxito",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Error al guardar la partida: " + ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-                );
-            }
-        }
     }
 
     private void showBattleHistory() {

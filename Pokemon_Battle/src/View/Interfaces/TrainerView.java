@@ -8,4 +8,5 @@ public interface TrainerView {
     boolean validateNames(String name1, String name2);
     void setController(TrainerController controller);
     void nextView();
+    void showError(String message);
 }

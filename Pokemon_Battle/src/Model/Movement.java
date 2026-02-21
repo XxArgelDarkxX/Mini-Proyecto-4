@@ -7,7 +7,8 @@ public class Movement {
     private String name;
     public Type type;
     public TypeAttack typeAttack;
-    private byte power;
+    private int power;
+    private int accuracy;
 
     public Movement(){}
 
@@ -16,6 +17,16 @@ public class Movement {
         this.typeAttack = TypeAttack.valueOf(typeAttack.toUpperCase());
         this.type = Type.valueOf(type.toUpperCase());
         this.power = power;
+        this.accuracy = 100;
+    }
+    
+    // Constructor compatible con API
+    public Movement(String name, String type, int power, int accuracy) {
+        this.name = name;
+        this.type = Type.valueOf(type.toUpperCase());
+        this.power = power;
+        this.accuracy = accuracy;
+        this.typeAttack = TypeAttack.FISICO; // Valor por defecto
     }
 
     public String getName() {
@@ -30,11 +41,19 @@ public class Movement {
     public void setType(Type type) {
         this.type = type;
     }
-    public byte getPower() {
+    public int getPower() {
         return power;
     }
-    public void setPower(byte power) {
+    public void setPower(int power) {
         this.power = power;
+    }
+    
+    public int getAccuracy() {
+        return accuracy;
+    }
+    
+    public void setAccuracy(int accuracy) {
+        this.accuracy = accuracy;
     }
 
     public TypeAttack getTypeAttack() {

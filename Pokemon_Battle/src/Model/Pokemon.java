@@ -1,5 +1,4 @@
 package Model;
-import Model.Data.Data;
 import java.util.ArrayList;
 public class Pokemon {
     private String pokedexId;
@@ -17,6 +16,8 @@ public class Pokemon {
     private String frontSprite;
     private String backSprite;
     private String icon;
+    private long experience = 0; // Experiencia acumulada
+    private long nextLevelExp = 100; // Experiencia necesaria para siguiente nivel
     private static final double[][] TYPE_EFFECTIVENESS = {
         //FUE   AGU   PLA   TIE   ELE   VOL   PSI   HIE   BIC   ROC   FAN   DRA   LUC   HAD   SIN   NOR   ACE   VEN
         { 0.5,  0.5,  2.0,  1.0,  1.0,  1.0,  1.0,  2.0,  2.0,  0.5,  1.0,  0.5,  1.0,  1.0,  1.0,  1.0,  2.0,  1.0 }, // FUEGO
@@ -166,22 +167,6 @@ public class Pokemon {
         this.moves = moves;
     }
 
-    public void setRandomMoves(ArrayList<Movement> moves) {
-        this.moves = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            int randomIndex = (int) (Math.random() * moves.size());
-            this.moves.add(moves.get(randomIndex));
-            moves.remove(randomIndex); // Se elimina el movimiento para evitar duplicados.
-        }
-        System.out.println("Los movimientos de " + this.name + " son: ");
-        for (Movement move : this.moves) {
-            System.out.println(move.getName() + " - " + move.getPower() + " de poder base.");
-        }
-        Data.initializeMoves(); // Se inicializan los movimientos para el siguiente Pokemon.
-    }
-    
-    // Este método calcula la efectividad de un movimiento de un tipo de Pokemon sobre otro tipo de Pokemon.
-    // El metodo es privado porque solo va a ser usado por la clase Pokemon.
     double moveEffectiveness(Type attack, Type defender) {
         return (double) TYPE_EFFECTIVENESS[attack.ordinal()][defender.ordinal()];
     }
@@ -221,5 +206,37 @@ public class Pokemon {
 
     public String getMoveName(byte moveIndex) {
         return moves.get(moveIndex).getName();
+    }
+
+    public long getExperience() {
+        return experience;
+    }
+
+    public void setExperience(long experience) {
+        this.experience = experience;
+    }
+
+    public long getNextLevelExp() {
+        return nextLevelExp;
+    }
+
+    public void setNextLevelExp(long nextLevelExp) {
+        this.nextLevelExp = nextLevelExp;
+    }
+    
+    public void setFrontSprite(String frontSprite) {
+        this.frontSprite = frontSprite;
+    }
+    
+    public void setBackSprite(String backSprite) {
+        this.backSprite = backSprite;
+    }
+    
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public void addExperience(long exp) {
+        this.experience += exp;
     }
 }

@@ -82,12 +82,18 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
         setSize(new java.awt.Dimension(734, 414));
         getContentPane().setLayout(null);
 
+        // Crear datos para la tabla de Trainer 2
+        Object[][] data2 = new Object[0][4];
+        if (trainers != null && trainers.length > 1 && trainers[1] != null && trainers[1].getPokemonTeam() != null && trainers[1].getPokemonTeam().size() >= 3) {
+            data2 = new Object [][] {
+                    {trainers[1].getPokemonTeam().get(0).getPokedexId() ,trainers[1].getPokemonTeam().get(0).getName(), trainers[1].getPokemonTeam().get(0).getType(), trainers[1].getPokemonTeam().get(0).getHp()},
+                    {trainers[1].getPokemonTeam().get(1).getPokedexId() ,trainers[1].getPokemonTeam().get(1).getName(), trainers[1].getPokemonTeam().get(1).getType(), trainers[1].getPokemonTeam().get(1).getHp()},
+                    {trainers[1].getPokemonTeam().get(2).getPokedexId() ,trainers[1].getPokemonTeam().get(2).getName(), trainers[1].getPokemonTeam().get(2).getType(), trainers[1].getPokemonTeam().get(2).getHp()}
+            };
+        }
+        
         Table2.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {trainers[1].getPokemonTeam().get(0).getPokedexId() ,trainers[1].getPokemonTeam().get(0).getName(), trainers[1].getPokemonTeam().get(0).getType(), trainers[1].getPokemonTeam().get(0).getHp()},
-                        {trainers[1].getPokemonTeam().get(1).getPokedexId() ,trainers[1].getPokemonTeam().get(1).getName(), trainers[1].getPokemonTeam().get(1).getType(), trainers[1].getPokemonTeam().get(1).getHp()},
-                        {trainers[1].getPokemonTeam().get(2).getPokedexId() ,trainers[1].getPokemonTeam().get(2).getName(), trainers[1].getPokemonTeam().get(2).getType(), trainers[1].getPokemonTeam().get(2).getHp()}
-                },
+                data2,
                 new String [] {
                         "ID", "Pokemon", "Tipo", "Vida"
                 }
@@ -106,12 +112,18 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
         getContentPane().add(jScrollPane2);
         jScrollPane2.setBounds(470, 180, 240, 80);
 
+        // Crear datos para la tabla de Trainer 1
+        Object[][] data1 = new Object[0][4];
+        if (trainers != null && trainers.length > 0 && trainers[0] != null && trainers[0].getPokemonTeam() != null && trainers[0].getPokemonTeam().size() >= 3) {
+            data1 = new Object [][] {
+                    {trainers[0].getPokemonTeam().get(0).getPokedexId() ,trainers[0].getPokemonTeam().get(0).getName(), trainers[0].getPokemonTeam().get(0).getType(), trainers[0].getPokemonTeam().get(0).getHp()},
+                    {trainers[0].getPokemonTeam().get(1).getPokedexId() ,trainers[0].getPokemonTeam().get(1).getName(), trainers[0].getPokemonTeam().get(1).getType(), trainers[0].getPokemonTeam().get(1).getHp()},
+                    {trainers[0].getPokemonTeam().get(2).getPokedexId() ,trainers[0].getPokemonTeam().get(2).getName(), trainers[0].getPokemonTeam().get(2).getType(), trainers[0].getPokemonTeam().get(2).getHp()}
+            };
+        }
+        
         Table1.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
-                        {trainers[0].getPokemonTeam().get(0).getPokedexId() ,trainers[0].getPokemonTeam().get(0).getName(), trainers[0].getPokemonTeam().get(0).getType(), trainers[0].getPokemonTeam().get(0).getHp()},
-                        {trainers[0].getPokemonTeam().get(1).getPokedexId() ,trainers[0].getPokemonTeam().get(1).getName(), trainers[0].getPokemonTeam().get(1).getType(), trainers[0].getPokemonTeam().get(1).getHp()},
-                        {trainers[0].getPokemonTeam().get(2).getPokedexId() ,trainers[0].getPokemonTeam().get(2).getName(), trainers[0].getPokemonTeam().get(2).getType(), trainers[0].getPokemonTeam().get(2).getHp()}
-                },
+                data1,
                 new String [] {
                         "ID", "Pokemon", "Tipo", "Vida"
                 }
@@ -357,8 +369,16 @@ public class PokemonsSelectionGUIView extends JFrame implements PokemonsSelectio
 
         @Override
         public void paint(Graphics g){
-            imagen = new ImageIcon(getClass().getResource("/View/Utils/fondoPokemones.jpeg")).getImage();
-            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+            try {
+                imagen = new ImageIcon(getClass().getResource("/View/Utils/fondoPokemones.jpeg")).getImage();
+                if (imagen != null) {
+                    g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
+                }
+            } catch (NullPointerException e) {
+                // Imagen no encontrada, usar fondo gris
+                g.setColor(java.awt.Color.DARK_GRAY);
+                g.fillRect(0, 0, getWidth(), getHeight());
+            }
 
             setOpaque(false);
 
