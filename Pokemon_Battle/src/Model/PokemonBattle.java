@@ -1,11 +1,10 @@
 package Model;
 
-import java.util.ArrayList;
-
+import Model.Exceptions.pokemonBattle.indexErrorException;
 import Model.Exceptions.pokemonBattle.pokemonNotFoundException;
 import Model.Exceptions.pokemonBattle.pokemonSelectionMovementException;
 import Model.Exceptions.pokemonBattle.quantityCheckException;
-import Model.Exceptions.pokemonBattle.indexErrorException;
+import java.util.ArrayList;
 
 public class PokemonBattle {
     private final Trainer[] trainers;
@@ -192,7 +191,7 @@ public class PokemonBattle {
         ); 
     }
     public BattleHistory getBattleHistory() { return battleHistory; }
-
+    
     public class BattleResult {
     private short pokemon1HP;
     private short pokemon2HP;

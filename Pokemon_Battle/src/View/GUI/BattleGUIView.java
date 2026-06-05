@@ -57,6 +57,7 @@ import javax.swing.JSeparator;
  */
 public class BattleGUIView extends JFrame {
 
+    private ApiClient apiClient; // <--- AÑADIDO
     public Trainer[] trainers;
     public String[] pokemonsBattle;
 
@@ -179,6 +180,7 @@ public class BattleGUIView extends JFrame {
     public BattleGUIView(Trainer[] trainers, String[] pokemonsBattle) throws quantityCheckException, pokemonNotFoundException {
         this.pokemonsBattle = pokemonsBattle;
         this.trainers = trainers;
+        this.apiClient = new ApiClient(); // <--- AÑADIDO
         Pokemon[] initialPokemons = new Pokemon[2];
         initialPokemons[0] = trainers[0].getPokemonTeam().get(0);
         initialPokemons[1] = trainers[1].getPokemonTeam().get(0);
@@ -192,6 +194,8 @@ public class BattleGUIView extends JFrame {
         loadPokemonImage();
         loadPokemonImage2();
         
+        // Desactivar botones del oponente (IA)
+        disableTrainer2Attacks();
     }
 
 
@@ -340,10 +344,10 @@ public class BattleGUIView extends JFrame {
         });
         attack1_2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack1_2ActionPerformed(evt);
+                executePlayerTurn(1);
             }
         });
-
+        
         attack1_1.setBackground(new Color(255, 255, 255));
         attack1_1.setFont(new Font("Roboto", 2, 15)); // NOI18N
         attack1_1.setText(trainers[0].getPokemonTeam().get(x).getMoves().get(0).getName());
@@ -358,7 +362,7 @@ public class BattleGUIView extends JFrame {
 
         attack1_1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack1_1ActionPerformed(evt);
+                executePlayerTurn(0);
             }
         });
         
@@ -376,7 +380,7 @@ public class BattleGUIView extends JFrame {
 
         attack1_3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack1_3ActionPerformed(evt);
+                executePlayerTurn(2);
             }
         });
         
@@ -394,7 +398,7 @@ public class BattleGUIView extends JFrame {
 
         attack1_4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack1_4ActionPerformed(evt);
+                executePlayerTurn(3);
             }
         });
         
@@ -440,7 +444,7 @@ public class BattleGUIView extends JFrame {
 
         attack2_1.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack2_1ActionPerformed(evt);
+                executePlayerTurn(0);
             }
         });
         attack2_2.setBackground(new Color(255, 255, 255));
@@ -456,7 +460,7 @@ public class BattleGUIView extends JFrame {
         });
         attack2_2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack2_2ActionPerformed(evt);
+                executePlayerTurn(1);
             }
         });
 
@@ -474,7 +478,7 @@ public class BattleGUIView extends JFrame {
 
         attack2_3.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack2_3ActionPerformed(evt);
+                executePlayerTurn(2);
             }
         });
 
@@ -492,7 +496,7 @@ public class BattleGUIView extends JFrame {
 
         attack2_4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                attack2_4ActionPerformed(evt);
+                executePlayerTurn(3);
             }
         });
 
@@ -985,14 +989,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack2_4ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack1_1.isEnabled() || attack1_2.isEnabled() || attack1_3.isEnabled() || attack1_4.isEnabled()) {
-            moveTrainer2 = 3;
-            disableTrainer2Attacks();
-        } else {
-            moveTrainer2 = 3;
-            disableTrainer2Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(3);
     }
 
     private void attack2_4MouseExited(MouseEvent evt) {
@@ -1007,14 +1004,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack2_3ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack1_1.isEnabled() || attack1_2.isEnabled() || attack1_3.isEnabled() || attack1_4.isEnabled()) {
-            moveTrainer2 = 2;
-            disableTrainer2Attacks();
-        } else {
-            moveTrainer2 = 2;
-            disableTrainer2Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(2);
     }
 
     private void attack2_3MouseExited(MouseEvent evt) {
@@ -1029,14 +1019,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack2_2ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack1_1.isEnabled() || attack1_2.isEnabled() || attack1_3.isEnabled() || attack1_4.isEnabled()) {
-            moveTrainer2 = 1;
-            disableTrainer2Attacks();
-        } else {
-            moveTrainer2 = 1;
-            disableTrainer2Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(1);
     }
 
     private void attack2_2MouseExited(MouseEvent evt) {
@@ -1051,14 +1034,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack2_1ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack1_1.isEnabled() || attack1_2.isEnabled() || attack1_3.isEnabled() || attack1_4.isEnabled()) {
-            moveTrainer2 = 0;
-            disableTrainer2Attacks();
-        } else {
-            moveTrainer2 = 0;
-            disableTrainer2Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(0);
     }
 
     private void attack2_1MouseExited(MouseEvent evt) {
@@ -1073,14 +1049,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack1_4ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack2_1.isEnabled() || attack2_2.isEnabled() || attack2_3.isEnabled() || attack2_4.isEnabled()) {
-            moveTrainer1 = 3;
-            disableTrainer1Attacks();
-        } else {
-            moveTrainer1 = 3;
-            disableTrainer1Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(3);
     }
 
     private void attack1_4MouseExited(MouseEvent evt) {
@@ -1095,14 +1064,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack1_3ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack2_1.isEnabled() || attack2_2.isEnabled() || attack2_3.isEnabled() || attack2_4.isEnabled()) {
-            moveTrainer1 = 2;
-            disableTrainer1Attacks();
-        } else {
-            moveTrainer1 = 2;
-            disableTrainer1Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(2);
     }
 
     private void attack1_3MouseExited(MouseEvent evt) {
@@ -1117,14 +1079,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack1_1ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack2_1.isEnabled() || attack2_2.isEnabled() || attack2_3.isEnabled() || attack2_4.isEnabled()) {
-            moveTrainer1 = 0;
-            disableTrainer1Attacks();
-        } else {
-            moveTrainer1 = 0;
-            disableTrainer1Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(0);
     }
 
     private void attack1_1MouseExited(MouseEvent evt) {
@@ -1139,14 +1094,7 @@ public class BattleGUIView extends JFrame {
 
     private void attack1_2ActionPerformed(ActionEvent evt) {
         // TODO add your handling code here:
-        if (attack2_1.isEnabled() || attack2_2.isEnabled() || attack2_3.isEnabled() || attack2_4.isEnabled()) {
-            moveTrainer1 = 1;
-            disableTrainer1Attacks();
-        } else {
-            moveTrainer1 = 1;
-            disableTrainer1Attacks();
-            attackBySpeed();
-        }
+        executePlayerTurn(1);
     }
 
     private void attack1_2MouseExited(MouseEvent evt) {
@@ -1223,6 +1171,34 @@ public class BattleGUIView extends JFrame {
         }.execute();
     }
 
+    private void executePlayerTurn(int playerMoveIndex) {
+        moveTrainer1 = (byte) playerMoveIndex;
+        disableTrainer1Attacks(); // Evitar que el jugador ataque de nuevo
+
+        new SwingWorker<Integer, Void>() {
+            @Override
+            protected Integer doInBackground() throws Exception {
+                // Llama a la IA para obtener su movimiento
+                return apiClient.getAIAction(trainers[0].getPokemonTeam().get(x), trainers[1].getPokemonTeam().get(y));
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    moveTrainer2 = get().byteValue();
+                    // Una vez que tenemos ambos movimientos, ejecutamos el turno
+                    attackBySpeed();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(BattleGUIView.this,
+                            "Error al obtener la acción de la IA: " + e.getMessage(),
+                            "Error de IA", JOptionPane.ERROR_MESSAGE);
+                    enableTrainer1Attacks(); // Habilitar botones de nuevo si hay error
+                }
+            }
+        }.execute();
+    }
+
         public void attackBySpeed() {
         Pokemon _pokemon1 = trainers[0].getPokemonTeam().get(x);
         Pokemon _pokemon2 = trainers[1].getPokemonTeam().get(y);
@@ -1255,12 +1231,27 @@ public class BattleGUIView extends JFrame {
                 attack2_2.setVisible(false);
                 attack2_3.setVisible(false);
                 attack2_4.setVisible(false);
-                pokemonSelectionPanel2.setVisible(true);
-                jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                
                 battleHistory.logPokemonFainted(_pokemon2.getName());
                 // Aumentar experiencia del Pokémon ganador
                 _pokemon1.addExperience(50);
                 checkBattleState();
+                
+                // Cambio automático para la IA (Trainer 2)
+                boolean switched = false;
+                for (int i = 0; i < trainers[1].getPokemonTeam().size(); i++) {
+                    if (trainers[1].getPokemonTeam().get(i).getHp() > 0) {
+                        selectPokemon(1, i);
+                        disableTrainer2Attacks(); // Ocultar ataques de la IA
+                        switched = true;
+                        break;
+                    }
+                }
+                if (!switched) {
+                    pokemonSelectionPanel2.setVisible(true);
+                    jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                }
+                
                 enableTrainer1Attacks();
                 battleHistory.saveBattleHistory();
             } else {
@@ -1352,12 +1343,27 @@ public class BattleGUIView extends JFrame {
                     attack2_2.setVisible(false);
                     attack2_3.setVisible(false);
                     attack2_4.setVisible(false);
-                    pokemonSelectionPanel2.setVisible(true);
-                    jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                    
                     battleHistory.logPokemonFainted(_pokemon2.getName());
                     // Aumentar experiencia del Pokémon ganador
                     _pokemon1.addExperience(50);
                     checkBattleState();
+                    
+                    // Cambio automático para la IA (Trainer 2)
+                    boolean switched = false;
+                    for (int i = 0; i < trainers[1].getPokemonTeam().size(); i++) {
+                        if (trainers[1].getPokemonTeam().get(i).getHp() > 0) {
+                            selectPokemon(1, i);
+                            disableTrainer2Attacks(); // Ocultar ataques de la IA
+                            switched = true;
+                            break;
+                        }
+                    }
+                    if (!switched) {
+                        pokemonSelectionPanel2.setVisible(true);
+                        jPanel2.setComponentZOrder(pokemonSelectionPanel2, 0);
+                    }
+                    
                     enableTrainer1Attacks();
                     battleHistory.saveBattleHistory();
                 } else {

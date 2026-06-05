@@ -146,3 +146,136 @@
 .info strong {
   color: #667eea;
 }
+
+.gachaOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.gachaModal {
+  width: min(460px, 100%);
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  padding: 22px;
+  text-align: center;
+}
+
+.gachaModal h2 {
+  margin: 0 0 14px 0;
+  color: #1f2937;
+}
+
+.gachaSpriteBox {
+  min-height: 180px;
+  border: 2px dashed #c7d2fe;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.gachaSprite {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.gachaPlaceholder {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.gachaStatus {
+  margin: 12px 0 0 0;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
+.gachaError {
+  margin: 12px 0 0 0;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.captureResult {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ecfeff;
+  color: #0f172a;
+}
+
+.captureResult p {
+  margin: 4px 0;
+}
+
+.gachaCloseBtn {
+  margin-top: 14px;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  cursor: pointer;
+}
+
+.gachaCloseBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pointsDisplay {
+  margin-top: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+}
+
+.pointsDisplay h3 {
+  margin: 0 0 8px 0;
+  color: white;
+  font-size: 1.8rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pointsDisplay p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.errorBanner {
+  margin-top: 20px;
+  padding: 15px 20px;
+  background: #fee2e2;
+  border: 2px solid #fca5a5;
+  border-radius: 12px;
+  color: #dc2626;
+  font-weight: 600;
+  text-align: center;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

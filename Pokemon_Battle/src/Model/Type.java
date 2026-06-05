@@ -5,5 +5,9 @@ public enum Type {
     ELECTRIC, FLYING, PSYCHIC,
     ICE, BUG, ROCK, GHOST,
     DRAGON, FIGHTING, FAIRY, DARK, NORMAL,
-    STEEL, POISON
+    STEEL, POISON;
+
+    public String getName() {
+        return this.name().toLowerCase();
+    }
 }

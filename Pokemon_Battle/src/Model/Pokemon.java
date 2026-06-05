@@ -71,6 +71,12 @@ public class Pokemon {
         return name;
     }
 
+    public Type[] getTypes() {
+        // Asumiendo que un Pokémon puede tener más de un tipo en el futuro.
+        // Por ahora, solo devolvemos el tipo principal en un array.
+        return new Type[]{this.type};
+    }
+
     public void setMaxHp(short maxHp) {
         this.maxHp = maxHp;
     }
@@ -183,10 +189,14 @@ public class Pokemon {
     public void movement(Pokemon target, int moveIndex) {
         Movement move = (Movement) this.moves.get(moveIndex);
         double effectiveness = moveEffectiveness(move.getType(), target.getType());
+        System.out.println(effectiveness);
         // Se obtiene el ataque del Pokemon atacante.
         short currentAttack = move.getTypeAttack() == Movement.TypeAttack.FISICO ? this.attack : this.specialAttack; 
-        short currentDefense = move.getTypeAttack() == Movement.TypeAttack.FISICO ? target.getDefense() 
+        short currentDefense = move.getTypeAttack() == Movement.TypeAttack.FISICO ? target.getDefense()
         : target.getSpecialDefense(); // Se obtiene la defensa del Pokemon defensor.
+        System.out.println(currentAttack);
+        System.out.println(currentDefense);
+        System.out.println((target.getHp() - (((currentAttack/currentDefense) * move.getPower()) * effectiveness + 2)));
         target.setHp((short) (target.getHp() - (((currentAttack/currentDefense) * move.getPower()) * effectiveness + 2))); // Se resta la vida del Pokemon objetivo.
     }
 
@@ -197,8 +207,12 @@ public class Pokemon {
     short attackStat = move.getTypeAttack() == Movement.TypeAttack.FISICO ? this.attack : this.specialAttack;
     short defenseStat = move.getTypeAttack() == Movement.TypeAttack.FISICO ? defender.getDefense() : defender.getSpecialDefense();
     
-    // Fórmula simplificada de daño Pokémon
-    int damage = (int) ((((2 * this.level / 5 + 2) * move.getPower() * attackStat / defenseStat) / 50 + 2) * effectiveness);
+    // Fórmula estándar de daño Pokémon: (((2*level/5 + 2) * power * attack/defense) / 50 + 2) * effectiveness
+    int baseDamage = (int) (((2 * this.level / 5.0 + 2) * move.getPower() * attackStat) / defenseStat / 50.0 + 2);
+    int damage = (int) (baseDamage * effectiveness);
+    
+    // Asegurar que el daño sea mínimo 1
+    damage = Math.max(1, damage);
     
     defender.setHp((short) Math.max(0, defender.getHp() - damage));
     return damage;
@@ -238,5 +252,26 @@ public class Pokemon {
 
     public void addExperience(long exp) {
         this.experience += exp;
+        // Verificar si sube de nivel
+        while (this.experience >= this.nextLevelExp) {
+            this.experience -= this.nextLevelExp;
+            this.level++;
+            this.nextLevelExp += 100;
+            
+            // Recalcular stats al subir de nivel
+            recalculateStats();
+        }
     }
+    
+    private void recalculateStats() {
+        // Los stats se recalculan basándose en el nuevo nivel
+        // Nota: En una implementación completa, deberías guardar los stats base
+        // para poder recalcular correctamente. Por ahora, solo actualizamos HP.
+        short newMaxHp = calculateHP((short)(this.maxHp), this.level);
+        this.maxHp = newMaxHp;
+        this.hp = newMaxHp; // Restaurar HP al subir de nivel
+    }
+    
 }
+
+

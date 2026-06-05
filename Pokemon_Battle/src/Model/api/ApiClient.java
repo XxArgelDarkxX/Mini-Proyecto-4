@@ -135,6 +135,7 @@ public class ApiClient {
         if (authToken != null) {
             try {
                 postWithAuth("/trainers/" + suId + "/stats/win", "{}");
+                putWithAuth("/trainers/points/"+ suId + "/win", "{}");
                 return;
             } catch (IOException e) {
                 // Fallback to non-auth if auth token is invalid
@@ -434,7 +435,7 @@ public class ApiClient {
             pokemonList.add(pokemon);
         }
         
-        return pokemonList.toArray(new Pokemon[0]);
+        return pokemonList.toArray(Pokemon[]::new);
     }
 
     private Pokemon parsePokemonFromJson(JsonObject json) {
@@ -504,7 +505,7 @@ public class ApiClient {
     }
 
     public void setAuthToken(String token) {
-        this.authToken = token;
+        ApiClient.authToken = token;
     }
 
     public int getTrainerId() {
@@ -514,4 +515,70 @@ public class ApiClient {
     public void setTrainerId(int id) {
         this.trainerId = id;
     }
+
+    // ======================== IA BATTLE ========================
+
+    public static class MoveInfo {
+        public String name;
+        public String type;
+        public int power;
+
+        public MoveInfo(Movement move) {
+            this.name = move.getName();
+            this.type = move.getType().getName();
+            this.power = move.getPower();
+        }
+    }
+
+    public static class PokemonInfo {
+        public String name;
+        public int hp;
+        public int max_hp;
+        public int level;
+        public java.util.List<String> type;
+        public java.util.List<MoveInfo> moves;
+
+        public PokemonInfo(Pokemon p) {
+            this.name = p.getName();
+            this.hp = p.getHp();
+            this.max_hp = p.getMaxHp();
+            this.level = p.getLevel();
+            this.type = new ArrayList<>();
+            for (Type t : p.getTypes()) {
+                this.type.add(t.getName());
+            }
+            this.moves = new ArrayList<>();
+            for (Movement m : p.getMoves()) {
+                if (m != null) {
+                    this.moves.add(new MoveInfo(m));
+                }
+            }
+        }
+    }
+
+    public static class BattleState {
+        public PokemonInfo player_pokemon;
+        public PokemonInfo opponent_pokemon;
+        public java.util.List<PokemonInfo> opponent_team; // Se envía vacío por ahora
+
+        public BattleState(Pokemon player, Pokemon opponent) {
+            this.player_pokemon = new PokemonInfo(player);
+            this.opponent_pokemon = new PokemonInfo(opponent);
+            this.opponent_team = new ArrayList<>(); // Lógica de cambio no implementada
+        }
+    }
+
+    public int getAIAction(Pokemon playerPokemon, Pokemon opponentPokemon) throws IOException, InterruptedException {
+        BattleState battleState = new BattleState(playerPokemon, opponentPokemon);
+        String jsonPayload = gson.toJson(battleState);
+
+        String response = post("/ai/decide-action", jsonPayload);
+        
+        // La respuesta ahora es un entero simple
+        return Integer.parseInt(response.trim());
+    }
+
+
+    // ======================== BÚSQUEDA DE ENTRENADORES ========================
+// ...existing code...
 }

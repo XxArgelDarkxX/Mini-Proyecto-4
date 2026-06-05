@@ -6,6 +6,7 @@ import Model.Movement;
 import Model.Type;
 import Model.api.ApiClient;
 import View.Interfaces.TrainerView;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 import java.util.ArrayList;
@@ -83,13 +84,13 @@ public class TrainerController {
     private void assignDefaultPokemons(Trainer trainer, ApiClient apiClient) throws Exception {
         // Obtener lista de Pokémon disponibles
         String pokemonJsonList = apiClient.getPokemonList();
-        com.google.gson.Gson gson = new com.google.gson.Gson();
-        com.google.gson.JsonObject response = gson.fromJson(pokemonJsonList, com.google.gson.JsonObject.class);
-        com.google.gson.JsonArray pokemonArray = response.getAsJsonArray("pokemons");
+        Gson gson = new Gson();
+        JsonObject response = gson.fromJson(pokemonJsonList, JsonObject.class);
+        JsonArray pokemonArray = response.getAsJsonArray("pokemons");
         
         // Asignar los primeros 3 Pokémon
         for (int i = 0; i < 3 && i < pokemonArray.size(); i++) {
-            com.google.gson.JsonObject pokemonJson = pokemonArray.get(i).getAsJsonObject();
+            JsonObject pokemonJson = pokemonArray.get(i).getAsJsonObject();
             Pokemon pokemon = parsePokemonFromJson(pokemonJson);
             trainer.addPokemonToTeam(pokemon);
         }
@@ -106,16 +107,16 @@ public class TrainerController {
         return list;
     }
     
-    private Pokemon parsePokemonFromJson(com.google.gson.JsonObject json) {
+    private Pokemon parsePokemonFromJson(JsonObject json) {
         String pokedexId = json.get("pokedex_id").getAsString();
         String name = json.get("name").getAsString();
         String typeStr = json.get("type").getAsString();
         
-        Model.Type type = Model.Type.NORMAL;
+        Type type = Type.NORMAL;
         try {
-            type = Model.Type.valueOf(typeStr.toUpperCase());
+            type = Type.valueOf(typeStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            type = Model.Type.NORMAL;
+            type = Type.NORMAL;
         }
         
         int baseHp = json.get("base_hp").getAsInt();
@@ -125,16 +126,16 @@ public class TrainerController {
         int baseSpDef = json.get("base_special_defense").getAsInt();
         int baseSpeed = json.get("base_speed").getAsInt();
         
-        ArrayList<Model.Movement> moves = new ArrayList<>();
-        com.google.gson.JsonArray movesArray = json.getAsJsonArray("moves");
+        ArrayList<Movement> moves = new ArrayList<>();
+        JsonArray movesArray = json.getAsJsonArray("moves");
         for (int i = 0; i < movesArray.size() && i < 4; i++) {
-            com.google.gson.JsonObject moveJson = movesArray.get(i).getAsJsonObject();
+            JsonObject moveJson = movesArray.get(i).getAsJsonObject();
             String moveName = moveJson.get("name").getAsString();
             String moveType = moveJson.get("type").getAsString();
             int power = moveJson.get("power").getAsInt();
             int accuracy = moveJson.get("accuracy").getAsInt();
             
-            Model.Movement move = new Model.Movement(moveName, moveType, power, accuracy);
+            Movement move = new Movement(moveName, moveType, power, accuracy);
             moves.add(move);
         }
         

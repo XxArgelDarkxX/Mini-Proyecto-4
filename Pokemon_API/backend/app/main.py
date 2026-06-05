@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import pokemons, trainers, battles, auth
+from app.routes import pokemons, trainers, battles, ai_client, auth
 from app.db.mongo import connect_db, close_db
 
 app = FastAPI(title="Pokemon Battle API")
@@ -28,4 +28,5 @@ async def health() -> dict:
 app.include_router(pokemons.router, prefix="/api/pokemons", tags=["Pokemons"])
 app.include_router(trainers.router, prefix="/api/trainers", tags=["Trainers"])
 app.include_router(battles.router, prefix="/api/battles", tags=["Battles"])
+app.include_router(ai_client.router, prefix="/api/ai", tags=["AI"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])

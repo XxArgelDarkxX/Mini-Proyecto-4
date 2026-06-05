@@ -316,3 +316,200 @@
 .inventory::-webkit-scrollbar-thumb:hover {
   background: #764ba2;
 }
+
+/* Card Overlay para acciones */
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.pokemonCard:hover .cardOverlay {
+  display: flex;
+}
+
+.cardActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 85%;
+}
+
+.actionBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.actionBtn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.actionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.actionBtn.secondary {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Inventory Overlay */
+.inventoryOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.inventoryItem:hover .inventoryOverlay {
+  display: flex;
+}
+
+.inventoryActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 90%;
+}
+
+.addBtn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.addBtn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.addBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.addBtn.secondary {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.teamFullBadge {
+  background: rgba(239, 68, 68, 0.8);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  animation: slideInToast 0.3s ease-out, slideOutToast 0.3s ease-out 2.7s forwards;
+  z-index: 999;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToast {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    padding-bottom: 15px;
+  }
+
+  .stats {
+    width: 100%;
+  }
+
+  .team {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .inventory {
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px;
+  }
+
+  .team {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .statBox {
+    width: 100%;
+  }
+}
+

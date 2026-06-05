@@ -27,6 +27,7 @@ export interface Trainer {
   sprite: number;
   wins: number;
   losses: number;
+  points: number;
   team: number[];
   inventory: number[];
   team_detail?: Pokemon[];
@@ -40,6 +41,12 @@ export interface Pokemon {
   experience?: number;
   next_level_exp?: number;
   types: string[];
+  base_hp?: number;
+  base_attack?: number;
+  base_defense?: number;
+  base_special_attack?: number;
+  base_special_defense?: number;
+  base_speed?: number;
   base_stats: {
     hp: number;
     attack: number;
@@ -60,6 +67,41 @@ export interface Move {
   type: string;
   power: number;
   accuracy: number;
+}
+
+export interface CaptureSpinInfo {
+  duration_ms: number;
+  sprites: string[];
+  final_sprite: string;
+}
+
+export interface CapturedPokemon extends Pokemon {
+  level_range?: {
+    min: number;
+    max: number;
+  };
+}
+
+export interface CapturePokemonResponse {
+  status: string;
+  trainer_suid: number;
+  points_remaining: number;
+  points_spent: number;
+  team_count: number;
+  inventory_count: number;
+  spin: CaptureSpinInfo;
+  captured_pokemon: CapturedPokemon;
+}
+
+export interface RedeemCouponResponse {
+  status: string;
+  trainer_suid: number;
+  points_remaining: number;
+  points_redeemed: number;
+  coupon_code: string;
+  expiration_date: string;
+  redirect_url: string;
+  message: string;
 }
 
 // Función auxiliar para obtener el token almacenado
@@ -260,6 +302,48 @@ export async function getAllPokemons(): Promise<Pokemon[]> {
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.detail || 'Error al obtener Pokémon');
+  }
+
+  return response.json();
+}
+
+export async function captureRandomPokemon(suid: number): Promise<CapturePokemonResponse> {
+  const response = await fetch(`${API_URL}/trainers/${suid}/capture`, {
+    method: 'POST',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Error al capturar Pokémon');
+  }
+
+  return response.json();
+}
+
+export async function redeemCoupon(suid: number): Promise<RedeemCouponResponse> {
+  const response = await fetch(`${API_URL}/trainers/points/${suid}/redeem_coupon`, {
+    method: 'POST',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Error al canjear cupón');
+  }
+
+  return response.json();
+}
+
+export async function getTrainerPoints(suid: number): Promise<{ trainer_suid: number; points: number }> {
+  const response = await fetch(`${API_URL}/trainers/points/${suid}`, {
+    method: 'GET',
+    headers: getAuthHeaders()
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.detail || 'Error al obtener puntos');
   }
 
   return response.json();
